@@ -85,9 +85,10 @@ export default class AppStream extends Component<AppStreamProps, AppStreamState>
                 streamConfig = {
                     videoElementId: 'remote-video',
                     audioElementId: 'remote-audio',
-                    // DATE Phase 0: substrate is plain HTTP/WS over Tailscale (no TLS yet).
-                    // authenticate:true forces appLevelProtocol=5 (wss/https). false → appLevelProtocol=4 (ws/http).
-                    authenticate: false,
+                    // DATE Phase 0: substrate fronted by Caddy with Tailscale-issued Let's Encrypt
+                    // cert at wss://dasb256.tailcb8137.ts.net:49100 → kit ws://127.0.0.1:49099.
+                    // authenticate:true → appLevelProtocol=5 (wss); matches our TLS-terminated substrate.
+                    authenticate: true,
                     maxReconnects: 20,
                     signalingServer: StreamConfig.local.server,
                     signalingPort: StreamConfig.local.signalingPort,
@@ -119,7 +120,7 @@ export default class AppStream extends Component<AppStreamProps, AppStreamState>
                     mic: false,
                     videoElementId: 'remote-video',
                     audioElementId: 'remote-audio',
-                    authenticate: false,
+                    authenticate: true,
                     maxReconnects: 20,
                     nativeTouchEvents: true,
                     width: 1920,
