@@ -14,8 +14,8 @@
         "cmsId": 0
     },
     "local": {
-        "$comment": "Required props if source is set to 'local'.",
-        "server": "127.0.0.1",
+        "$comment": "DATE Phase 0 — connects to omni-composer-streaming on DASB256 over Tailscale.",
+        "server": "dasb256.tailcb8137.ts.net",
         "signalingPort": 49100,
         "mediaPort": null
     }

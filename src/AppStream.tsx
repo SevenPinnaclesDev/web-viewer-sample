@@ -85,7 +85,9 @@ export default class AppStream extends Component<AppStreamProps, AppStreamState>
                 streamConfig = {
                     videoElementId: 'remote-video',
                     audioElementId: 'remote-audio',
-                    authenticate: true,
+                    // DATE Phase 0: substrate is plain HTTP/WS over Tailscale (no TLS yet).
+                    // authenticate:true forces appLevelProtocol=5 (wss/https). false → appLevelProtocol=4 (ws/http).
+                    authenticate: false,
                     maxReconnects: 20,
                     signalingServer: StreamConfig.local.server,
                     signalingPort: StreamConfig.local.signalingPort,
