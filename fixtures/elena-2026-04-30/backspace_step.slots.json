@@ -1,0 +1,116 @@
+{
+  "asset": "backspace_step",
+  "source_path": "/data/outputs/backspace_step.usd",
+  "stage": {
+    "default_prim": "backspace_step",
+    "meters_per_unit": 0.001,
+    "up_axis": "Z"
+  },
+  "slots": [
+    {
+      "slot_id": "/backspace_step/Prototypes/root/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/backspace_step/Prototypes/root/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/backspace_step/root/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/backspace_step/root/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/backspace_step/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/backspace_step/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    }
+  ],
+  "summary": {
+    "slot_count": 6,
+    "bound_slot_count": 0,
+    "unbound_slot_count": 6,
+    "duplicate_color_clusters": [
+      {
+        "color": [
+          0.494,
+          0.494,
+          0.525
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.627,
+          0.627,
+          0.643
+        ],
+        "slot_count": 3
+      }
+    ]
+  },
+  "spike_meta": {
+    "generated_by": "ryan/dump_material_slots.py",
+    "purpose": "slot-list spike fixture for the SPA \u2014 shape mirrors what query_material_slots will return over input_channel_v1"
+  }
+}

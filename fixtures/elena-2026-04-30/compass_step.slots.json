@@ -1,0 +1,2043 @@
+{
+  "asset": "compass_step",
+  "source_path": "/data/outputs/compass_step.usd",
+  "stage": {
+    "default_prim": "compass_step",
+    "meters_per_unit": 0.001,
+    "up_axis": "Z"
+  },
+  "slots": [
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000/tn__Body227_h7/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000/tn__Body1414_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000/tn__Body14141_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000/tn__Body1414_i88Z2NP/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1/tn__Body2274_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1/tn__Body1418_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1/tn__Body14145_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000_1/tn__Body14144_j98Ap2CQFT/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1_1/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1_1/tn__Body2273_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1_1/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1_1/tn__Body1417_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_1_1/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_1_1/tn__Body14144_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000_1_1/tn__Body14143_j98Ap2CQFT/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_2/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_2/tn__Body2272_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_2/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_2/tn__Body1416_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_2/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_2/tn__Body14143_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000_2/tn__Body14142_j98Ap2CQFT/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_3/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_3/tn__Body2271_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_3/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_3/tn__Body1415_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_3/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_3/tn__Body14142_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000_3/tn__Body14141_j98Ap2CQFT/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GB200300Manifold_uGw7/Looks/Diffuse_3",
+      "source_name": "Diffuse_3",
+      "display_name": "Diffuse 3",
+      "placeholder_color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GB200300Manifold_uGw7/Looks/Diffuse_4",
+      "source_name": "Diffuse_4",
+      "display_name": "Diffuse 4",
+      "placeholder_color": [
+        0.0,
+        0.0,
+        0.984
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GB200300Manifold_uGw7/Looks/Diffuse_5",
+      "source_name": "Diffuse_5",
+      "display_name": "Diffuse 5",
+      "placeholder_color": [
+        0.984,
+        0.016,
+        0.016
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GB200300Manifold_uGw7/Looks/Diffuse_6",
+      "source_name": "Diffuse_6",
+      "display_name": "Diffuse 6",
+      "placeholder_color": [
+        0.992,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff4_n9Z2N/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff4_n9Z2N/tn__Imported2584_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff4_n9Z2N/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff4_n9Z2N/tn__Imported2574_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_n9Z2N/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_n9Z2N/tn__Imported2583_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_n9Z2N/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_n9Z2N/tn__Imported2573_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_1_pBp2P/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_1_pBp2P/tn__Imported2583_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_1_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_1_pBp2P/tn__Imported2573_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_n9Z2N/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_n9Z2N/tn__Imported2582_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_n9Z2N/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_n9Z2N/tn__Imported2572_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_1_pBp2P/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_1_pBp2P/tn__Imported2582_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_1_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_1_pBp2P/tn__Imported2572_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_n9Z2N/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_n9Z2N/tn__Imported2581_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_n9Z2N/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_n9Z2N/tn__Imported2571_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_2_pBp2P/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_2_pBp2P/tn__Imported2542_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_2_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_2_pBp2P/tn__Imported2532_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_1_pBp2P/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_1_pBp2P/tn__Imported2541_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_1_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_1_pBp2P/tn__Imported2531_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_3_pBp2P/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_3_pBp2P/tn__Imported2522_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_3_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_3_pBp2P/tn__Imported2512_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_2_pBp2P/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_2_pBp2P/tn__Imported2521_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_2_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_2_pBp2P/tn__Imported2511_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_4_pBp2P/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_4_pBp2P/tn__Imported2502_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_4_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_4_pBp2P/tn__Imported2492_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_3_pBp2P/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_3_pBp2P/tn__Imported2501_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_3_pBp2P/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_3_pBp2P/tn__Imported2491_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__MechanicalItems1_wGGj4d0/Looks/Diffuse_10",
+      "source_name": "Diffuse_10",
+      "display_name": "Diffuse 10",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__MechanicalItems1_wGGj4d0/tn__Nut1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff4_n9Z2N_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff4_n9Z2N_1/tn__Imported2584_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff4_n9Z2N_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff4_n9Z2N_1/tn__Imported2574_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_n9Z2N_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_n9Z2N_1/tn__Imported2583_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_n9Z2N_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_n9Z2N_1/tn__Imported2573_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_1_pBp2P_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_1_pBp2P_1/tn__Imported2583_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff3_1_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff3_1_pBp2P_1/tn__Imported2573_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_n9Z2N_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_n9Z2N_1/tn__Imported2582_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_n9Z2N_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_n9Z2N_1/tn__Imported2572_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_1_pBp2P_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_1_pBp2P_1/tn__Imported2582_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_1_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_1_pBp2P_1/tn__Imported2572_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_n9Z2N_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_n9Z2N_1/tn__Imported2581_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_n9Z2N_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_n9Z2N_1/tn__Imported2571_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_2_pBp2P_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_2_pBp2P_1/tn__Imported2542_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_2_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_2_pBp2P_1/tn__Imported2532_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_1_pBp2P_1/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_1_pBp2P_1/tn__Imported2541_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_1_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_1_pBp2P_1/tn__Imported2531_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_3_pBp2P_1/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_3_pBp2P_1/tn__Imported2522_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_3_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_3_pBp2P_1/tn__Imported2512_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_2_pBp2P_1/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_2_pBp2P_1/tn__Imported2521_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_2_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_2_pBp2P_1/tn__Imported2511_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_4_pBp2P_1/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_4_pBp2P_1/tn__Imported2502_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff2_4_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff2_4_pBp2P_1/tn__Imported2492_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_3_pBp2P_1/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_3_pBp2P_1/tn__Imported2501_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoff1_3_pBp2P_1/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Standoff1_3_pBp2P_1/tn__Imported2491_qCCe3V0/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__MechanicalItems1_wGGj4d0_1/Looks/Diffuse_10",
+      "source_name": "Diffuse_10",
+      "display_name": "Diffuse 10",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__MechanicalItems1_wGGj4d0_1/tn__Nut1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Pan1_d4q0D/Looks/Diffuse_11",
+      "source_name": "Diffuse_11",
+      "display_name": "Diffuse 11",
+      "placeholder_color": [
+        0.059,
+        0.373,
+        0.686
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Pan1_d4q0D/tn__BasePan1_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__DataCenter_kA/Looks/Diffuse_12",
+      "source_name": "Diffuse_12",
+      "display_name": "Diffuse 12",
+      "placeholder_color": [
+        0.322,
+        0.322,
+        0.361
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__DataCenter_kA/Looks/Diffuse_13",
+      "source_name": "Diffuse_13",
+      "display_name": "Diffuse 13",
+      "placeholder_color": [
+        0.58,
+        0.58,
+        0.137
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__DataCenter_kA/Looks/Diffuse_14",
+      "source_name": "Diffuse_14",
+      "display_name": "Diffuse 14",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__DataCenter_kA/Looks/Diffuse_15",
+      "source_name": "Diffuse_15",
+      "display_name": "Diffuse 15",
+      "placeholder_color": [
+        0.227,
+        0.518,
+        0.29
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__DataCenter_kA/FullMGX/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_4/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_4/tn__Body2271_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_4/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_4/tn__Body1415_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/Compass6000_4/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 2,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/Compass6000_4/tn__Body14142_j98Ap2CQFT/Mesh",
+        "/compass_step/Prototypes/Compass6000_4/tn__Body14141_j98Ap2CQFT/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoffs1_pAi2P/Looks/Diffuse_16",
+      "source_name": "Diffuse_16",
+      "display_name": "Diffuse 16",
+      "placeholder_color": [
+        0.878,
+        0.949,
+        1.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Standoffs1_pAi2P/Looks/Diffuse_17",
+      "source_name": "Diffuse_17",
+      "display_name": "Diffuse 17",
+      "placeholder_color": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_18",
+      "source_name": "Diffuse_18",
+      "display_name": "Diffuse 18",
+      "placeholder_color": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Folder822_l99i2P/tn__PCB1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_19",
+      "source_name": "Diffuse_19",
+      "display_name": "Diffuse 19",
+      "placeholder_color": [
+        0.898,
+        0.918,
+        0.929
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__Folder822_l99i2P/tn__Topheat1_h88Z2N/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_20",
+      "source_name": "Diffuse_20",
+      "display_name": "Diffuse 20",
+      "placeholder_color": [
+        0.506,
+        0.016,
+        0.016
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_21",
+      "source_name": "Diffuse_21",
+      "display_name": "Diffuse 21",
+      "placeholder_color": [
+        0.894,
+        1.0,
+        0.443
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_22",
+      "source_name": "Diffuse_22",
+      "display_name": "Diffuse 22",
+      "placeholder_color": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__Folder822_l99i2P/Looks/Diffuse_23",
+      "source_name": "Diffuse_23",
+      "display_name": "Diffuse 23",
+      "placeholder_color": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GenericEmbedded_sF/Looks/Diffuse_15",
+      "source_name": "Diffuse_15",
+      "display_name": "Diffuse 15",
+      "placeholder_color": [
+        0.227,
+        0.518,
+        0.29
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__GenericEmbedded_sF/tn__NanoIOPCB1_pAi2P/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Prototypes/tn__GenericEmbedded_sF/Looks/Diffuse_24",
+      "source_name": "Diffuse_24",
+      "display_name": "Diffuse 24",
+      "placeholder_color": [
+        0.408,
+        0.408,
+        0.498
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/Prototypes/tn__GenericEmbedded_sF/tn__GenericEmbeddedSystem_yLG/Mesh"
+      ],
+      "is_in_prototypes": true
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse",
+      "source_name": "Diffuse",
+      "display_name": "Diffuse",
+      "placeholder_color": [
+        1.0,
+        0.627,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_1",
+      "source_name": "Diffuse_1",
+      "display_name": "Diffuse 1",
+      "placeholder_color": [
+        0.165,
+        0.298,
+        0.192
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_2",
+      "source_name": "Diffuse_2",
+      "display_name": "Diffuse 2",
+      "placeholder_color": [
+        0.0,
+        0.82,
+        0.482
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_3",
+      "source_name": "Diffuse_3",
+      "display_name": "Diffuse 3",
+      "placeholder_color": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_4",
+      "source_name": "Diffuse_4",
+      "display_name": "Diffuse 4",
+      "placeholder_color": [
+        0.0,
+        0.0,
+        0.984
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_5",
+      "source_name": "Diffuse_5",
+      "display_name": "Diffuse 5",
+      "placeholder_color": [
+        0.984,
+        0.016,
+        0.016
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_6",
+      "source_name": "Diffuse_6",
+      "display_name": "Diffuse 6",
+      "placeholder_color": [
+        0.992,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_7",
+      "source_name": "Diffuse_7",
+      "display_name": "Diffuse 7",
+      "placeholder_color": [
+        0.698,
+        0.133,
+        0.133
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_8",
+      "source_name": "Diffuse_8",
+      "display_name": "Diffuse 8",
+      "placeholder_color": [
+        0.322,
+        0.545,
+        0.545
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_9",
+      "source_name": "Diffuse_9",
+      "display_name": "Diffuse 9",
+      "placeholder_color": [
+        0.239,
+        0.541,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_10",
+      "source_name": "Diffuse_10",
+      "display_name": "Diffuse 10",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_11",
+      "source_name": "Diffuse_11",
+      "display_name": "Diffuse 11",
+      "placeholder_color": [
+        0.059,
+        0.373,
+        0.686
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_12",
+      "source_name": "Diffuse_12",
+      "display_name": "Diffuse 12",
+      "placeholder_color": [
+        0.322,
+        0.322,
+        0.361
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_13",
+      "source_name": "Diffuse_13",
+      "display_name": "Diffuse 13",
+      "placeholder_color": [
+        0.58,
+        0.58,
+        0.137
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_14",
+      "source_name": "Diffuse_14",
+      "display_name": "Diffuse 14",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_15",
+      "source_name": "Diffuse_15",
+      "display_name": "Diffuse 15",
+      "placeholder_color": [
+        0.227,
+        0.518,
+        0.29
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_16",
+      "source_name": "Diffuse_16",
+      "display_name": "Diffuse 16",
+      "placeholder_color": [
+        0.878,
+        0.949,
+        1.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_17",
+      "source_name": "Diffuse_17",
+      "display_name": "Diffuse 17",
+      "placeholder_color": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_18",
+      "source_name": "Diffuse_18",
+      "display_name": "Diffuse 18",
+      "placeholder_color": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_19",
+      "source_name": "Diffuse_19",
+      "display_name": "Diffuse 19",
+      "placeholder_color": [
+        0.898,
+        0.918,
+        0.929
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_20",
+      "source_name": "Diffuse_20",
+      "display_name": "Diffuse 20",
+      "placeholder_color": [
+        0.506,
+        0.016,
+        0.016
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_21",
+      "source_name": "Diffuse_21",
+      "display_name": "Diffuse 21",
+      "placeholder_color": [
+        0.894,
+        1.0,
+        0.443
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_22",
+      "source_name": "Diffuse_22",
+      "display_name": "Diffuse 22",
+      "placeholder_color": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_23",
+      "source_name": "Diffuse_23",
+      "display_name": "Diffuse 23",
+      "placeholder_color": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/Looks/Diffuse_24",
+      "source_name": "Diffuse_24",
+      "display_name": "Diffuse 24",
+      "placeholder_color": [
+        0.408,
+        0.408,
+        0.498
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/Looks/Diffuse_12",
+      "source_name": "Diffuse_12",
+      "display_name": "Diffuse 12",
+      "placeholder_color": [
+        0.322,
+        0.322,
+        0.361
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/Looks/Diffuse_13",
+      "source_name": "Diffuse_13",
+      "display_name": "Diffuse 13",
+      "placeholder_color": [
+        0.58,
+        0.58,
+        0.137
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/Looks/Diffuse_14",
+      "source_name": "Diffuse_14",
+      "display_name": "Diffuse 14",
+      "placeholder_color": [
+        0.627,
+        0.627,
+        0.643
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/Looks/Diffuse_15",
+      "source_name": "Diffuse_15",
+      "display_name": "Diffuse 15",
+      "placeholder_color": [
+        0.227,
+        0.518,
+        0.29
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/tn__DataCenter_kA/FullMGX/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/Looks/Diffuse_11",
+      "source_name": "Diffuse_11",
+      "display_name": "Diffuse 11",
+      "placeholder_color": [
+        0.059,
+        0.373,
+        0.686
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/tn__BasePan1_i88Z2N/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/tn__MechanicalItems1_wGGj4d0/Looks/Diffuse_10",
+      "source_name": "Diffuse_10",
+      "display_name": "Diffuse 10",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/tn__MechanicalItems1_wGGj4d0/tn__Nut1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/tn__MechanicalItems1_wGGj4d0/tn__MechanicalItems1_wGGj4d0/Looks/Diffuse_10",
+      "source_name": "Diffuse_10",
+      "display_name": "Diffuse 10",
+      "placeholder_color": [
+        0.494,
+        0.494,
+        0.525
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/tn__DataCenter_kA/tn__FullPan_h7/tn__Pan1_d4q0D/tn__MechanicalItems1_wGGj4d0/tn__MechanicalItems1_wGGj4d0/tn__Nut1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/Looks/Diffuse_15",
+      "source_name": "Diffuse_15",
+      "display_name": "Diffuse 15",
+      "placeholder_color": [
+        0.227,
+        0.518,
+        0.29
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__NanoIOPCB1_pAi2P/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/Looks/Diffuse_24",
+      "source_name": "Diffuse_24",
+      "display_name": "Diffuse 24",
+      "placeholder_color": [
+        0.408,
+        0.408,
+        0.498
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__GenericEmbeddedSystem_yLG/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_18",
+      "source_name": "Diffuse_18",
+      "display_name": "Diffuse 18",
+      "placeholder_color": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/tn__PCB1_d4q0D/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_19",
+      "source_name": "Diffuse_19",
+      "display_name": "Diffuse 19",
+      "placeholder_color": [
+        0.898,
+        0.918,
+        0.929
+      ],
+      "bound_prim_count": 1,
+      "bound_prim_paths_sample": [
+        "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/tn__Topheat1_h88Z2N/Mesh"
+      ],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_20",
+      "source_name": "Diffuse_20",
+      "display_name": "Diffuse 20",
+      "placeholder_color": [
+        0.506,
+        0.016,
+        0.016
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_21",
+      "source_name": "Diffuse_21",
+      "display_name": "Diffuse 21",
+      "placeholder_color": [
+        0.894,
+        1.0,
+        0.443
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_22",
+      "source_name": "Diffuse_22",
+      "display_name": "Diffuse 22",
+      "placeholder_color": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    },
+    {
+      "slot_id": "/compass_step/root/IndustrialEdge/tn__GenericEmbedded_sF/tn__AGXModule1_jAAr2R/tn__Folder822_l99i2P/Looks/Diffuse_23",
+      "source_name": "Diffuse_23",
+      "display_name": "Diffuse 23",
+      "placeholder_color": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "bound_prim_count": 0,
+      "bound_prim_paths_sample": [],
+      "is_in_prototypes": false
+    }
+  ],
+  "summary": {
+    "slot_count": 127,
+    "bound_slot_count": 82,
+    "unbound_slot_count": 45,
+    "duplicate_color_clusters": [
+      {
+        "color": [
+          0.322,
+          0.545,
+          0.545
+        ],
+        "slot_count": 25
+      },
+      {
+        "color": [
+          0.698,
+          0.133,
+          0.133
+        ],
+        "slot_count": 17
+      },
+      {
+        "color": [
+          0.239,
+          0.541,
+          0.0
+        ],
+        "slot_count": 9
+      },
+      {
+        "color": [
+          1.0,
+          0.627,
+          0.0
+        ],
+        "slot_count": 7
+      },
+      {
+        "color": [
+          0.165,
+          0.298,
+          0.192
+        ],
+        "slot_count": 7
+      },
+      {
+        "color": [
+          0.0,
+          0.82,
+          0.482
+        ],
+        "slot_count": 7
+      },
+      {
+        "color": [
+          0.494,
+          0.494,
+          0.525
+        ],
+        "slot_count": 5
+      },
+      {
+        "color": [
+          0.227,
+          0.518,
+          0.29
+        ],
+        "slot_count": 5
+      },
+      {
+        "color": [
+          0.059,
+          0.373,
+          0.686
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.322,
+          0.322,
+          0.361
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.58,
+          0.58,
+          0.137
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.627,
+          0.627,
+          0.643
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.898,
+          0.918,
+          0.929
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.506,
+          0.016,
+          0.016
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.894,
+          1.0,
+          0.443
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          0.0
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.408,
+          0.408,
+          0.498
+        ],
+        "slot_count": 3
+      },
+      {
+        "color": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "slot_count": 2
+      },
+      {
+        "color": [
+          0.0,
+          0.0,
+          0.984
+        ],
+        "slot_count": 2
+      },
+      {
+        "color": [
+          0.984,
+          0.016,
+          0.016
+        ],
+        "slot_count": 2
+      },
+      {
+        "color": [
+          0.992,
+          0.0,
+          0.0
+        ],
+        "slot_count": 2
+      },
+      {
+        "color": [
+          0.878,
+          0.949,
+          1.0
+        ],
+        "slot_count": 2
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "slot_count": 2
+      }
+    ]
+  },
+  "spike_meta": {
+    "generated_by": "ryan/dump_material_slots.py",
+    "purpose": "slot-list spike fixture for the SPA \u2014 shape mirrors what query_material_slots will return over input_channel_v1"
+  }
+}

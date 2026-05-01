@@ -1,0 +1,92 @@
+/*
+ * SpikeApp shell styling — Ryan Takeda 2026-04-30
+ */
+.spike-root {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #121212;
+    color: rgba(255, 255, 255, 0.87);
+    overflow: hidden;
+}
+
+.spike-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: #1c1c1c;
+    border-bottom: 1px solid #2c2c2c;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.spike-title {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.spike-title strong {
+    font-size: 1rem;
+}
+.spike-subtitle {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.spike-controls {
+    display: flex;
+    gap: 6px;
+}
+.spike-controls button {
+    background: #2a2a2a;
+    color: #ccc;
+    border: 1px solid #383838;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.12s, border-color 0.12s;
+}
+.spike-controls button:hover {
+    background: #333;
+}
+.spike-controls button.active {
+    background: #4060a0;
+    border-color: #5077c0;
+    color: #fff;
+}
+
+.spike-main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    padding: 14px;
+    gap: 14px;
+}
+.spike-main.mode-backspace,
+.spike-main.mode-compass {
+    grid-template-columns: minmax(0, 1fr);
+}
+.spike-main.mode-side-by-side {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+    .spike-main.mode-side-by-side {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+.spike-footer {
+    padding: 8px 18px;
+    background: #1a1a1a;
+    border-top: 1px solid #2c2c2c;
+    color: #777;
+    font-size: 0.75rem;
+}
+.spike-footer a {
+    color: #6a8edc;
+}
