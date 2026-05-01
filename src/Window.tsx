@@ -16,6 +16,8 @@ import StreamConfig from '../stream.config.json';
 import USDAsset from "./USDAsset";
 import USDStage from "./USDStage";
 import { headerHeight } from './App';
+import { InputChannel } from './services/inputChannel';
+import { SwatchPanel } from './components/swatch/SwatchPanel';
 
 
 interface USDAssetType {
@@ -58,9 +60,27 @@ interface AppStreamMessageType {
 }
 
 export default class App extends React.Component<AppProps, AppState> {
-    
+
     private usdStageRef = React.createRef<USDStage>();
     // private _streamConfig: StreamConfigType = getConfig();
+
+    /**
+     * input_channel_v1 — SPA-side wrapper for the contract-shaped data
+     * channel between web SPA and the streamed Kit. We instantiate it
+     * once (channel persists across re-renders) and let SwatchPanel /
+     * future components subscribe. The legacy event_type-shaped messages
+     * Window.tsx already handles below in _handleCustomEvent are NOT
+     * routed through this channel — InputChannel.handleFrame() returns
+     * false for them so they fall through to the legacy switch.
+     *
+     * The send fn wraps AppStream.sendMessage; the channel handles the
+     * JSON serialization.
+     *  — Ryan, Phase 1 Day 1, 2026-05-01.
+     */
+    private _inputChannel = new InputChannel(
+        (jsonText: string) => AppStream.sendMessage(jsonText),
+        { defaultTimeoutMs: 8_000 },
+    );
     
     constructor(props: AppProps) {
         super(props);
@@ -319,6 +339,15 @@ export default class App extends React.Component<AppProps, AppState> {
             return;
         }
 
+        // input_channel_v1 contract frames carry `id`+`ok` (response, §4.2)
+        // or `event` (unsolicited event, §4.3). Hand them off to the
+        // channel; if it consumed them, we're done. Otherwise fall through
+        // to the legacy event_type switch below.
+        //   — Ryan, Phase 1 Day 1, 2026-05-01.
+        if (this._inputChannel.handleFrame(event)) {
+            return;
+        }
+
         // response received once a USD asset is fully loaded
         if (event.event_type === "openedStageResult") {
             if (event.payload.result === "success") {
@@ -424,6 +453,22 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     /**
+    * @function _deriveAssetId
+    *
+    * Derive a contract-compatible asset_id from the USDAsset entry. The
+    * convention is the file basename without extension — matches Phase 0
+    * ingest's slug derivation. Falls back to null when no asset is open
+    * so SwatchPanel renders the "no asset" empty state.
+    *  — Ryan, Phase 1 Day 1, 2026-05-01.
+    */
+    private _deriveAssetId(asset: USDAssetType | undefined): string | null {
+        if (!asset || !asset.url) return null;
+        const tail = asset.url.split("/").pop() ?? asset.url;
+        const dot = tail.lastIndexOf(".");
+        return dot > 0 ? tail.slice(0, dot) : tail;
+    }
+
+    /**
     * @function _handleAppStreamFocus
     *
     * Update state when AppStream is in focus.
@@ -491,7 +536,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
                 {this.state.showUI &&
                 <>
-                        
+
                     {/* USD Asset Selector */}
                     <USDAsset
                         usdAssets={this.state.usdAssets}
@@ -509,6 +554,36 @@ export default class App extends React.Component<AppProps, AppState> {
                         fillUSDPrim={(value) => this._onFillUSDPrim(value)}
                         onReset={() => this._onStageReset()}
                         />
+
+                    {/*
+                      * SwatchPanel — Phase 1 paint-swatch primitive (Day 1 wiring).
+                      * Sits at the bottom of the right sidebar; Day 2 resizes the
+                      * stage panel and shares space cleanly. For Day 1 we overlap
+                      * intentionally — the demo path is "open Compass, click
+                      * Refresh, see slots".
+                      *
+                      * We pass the SPA-owned asset slug derived from the currently
+                      * selected USD asset. The contract requires the SPA tell the
+                      * extension which asset it expects (§5.1), and the extension
+                      * tolerates a mismatch — see material_commands.handle_query_slots.
+                      *  — Ryan, Phase 1 Day 1, 2026-05-01.
+                      */}
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: 0,
+                            bottom: 0,
+                            width: sidebarWidth,
+                            height: "40%",
+                            padding: "8px",
+                            boxSizing: "border-box",
+                        }}
+                    >
+                        <SwatchPanel
+                            channel={this.state.showStream ? this._inputChannel : null}
+                            assetId={this._deriveAssetId(this.state.selectedUSDAsset)}
+                        />
+                    </div>
                     </>
                 }
             </div>
