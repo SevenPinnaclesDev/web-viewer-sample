@@ -110,6 +110,30 @@ export function DropZone({
         };
     }, [closeSubscription]);
 
+    // Daemon-driven path: when the page loads with `?asset=<slug>` in
+    // the URL (delivered by tools/drop-daemon on the user's MacBook
+    // when an iCloud-folder drop hits "completed"), fire asset.open
+    // directly. Same kit-side handler the in-page drop's onCompleted
+    // uses. Fires once per channel-becomes-ready transition.
+    const urlAssetFiredRef = useRef(false);
+    useEffect(() => {
+        if (urlAssetFiredRef.current || !channel) return;
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get("asset");
+        if (!slug) return;
+        urlAssetFiredRef.current = true;
+        setToast({ kind: "loading", filename: slug, assetId: slug });
+        channel.openAsset(slug).then(() => {
+            setToast({ kind: "loaded", filename: slug, assetId: slug, nucleusUrl: "" });
+        }).catch((err: unknown) => {
+            setToast({
+                kind: "failed",
+                filename: slug,
+                reason: `kit declined load: ${err instanceof Error ? err.message : String(err)}`,
+            });
+        });
+    }, [channel]);
+
     const onCompleted = useCallback(async (info: IngestCompletedInfo, filename: string) => {
         setToast({ kind: "loading", filename, assetId: info.asset_slug });
         if (!channel) {
