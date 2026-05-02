@@ -25,6 +25,8 @@
 import type {
     ChannelRequest,
     ChannelEvent,
+    OpenAssetRequest,
+    OpenAssetResult,
     QuerySlotsResult,
     SetOverridesBulkResult,
 } from "./inputChannelTypes";
@@ -253,5 +255,28 @@ export class InputChannel {
             slot_ids: slotIds,
             mdl_path: mdlPath,
         });
+    }
+
+    /**
+     * Phase 1 close-the-loop (2026-05-01): ask the kit extension to load
+     * a new asset on the streamed viewport. Returns once the extension
+     * has acknowledged the load *request* — the actual `asset.opened`
+     * event lands later via the channel's event surface (see
+     * SwatchPanel's onEvent('asset.opened') subscription).
+     *
+     * This is the auto-fire target on the ingest pipeline's `completed`
+     * lifecycle frame: when ingest writes a freshly-converted asset to
+     * Nucleus, the SPA fires this with the `nucleus_url` from the
+     * `completed` frame's context, and the streamed viewport switches.
+     *
+     * @param assetId  the asset slug (e.g. "compass_step")
+     * @param version  optional version (omit to target `current` symlink)
+     * @param nucleusUrl  optional fully-resolved URL — kit honors verbatim
+     */
+    openAsset(assetId: string, version?: number, nucleusUrl?: string): Promise<OpenAssetResult> {
+        const payload: OpenAssetRequest = { asset_id: assetId };
+        if (version !== undefined) payload.version = version;
+        if (nucleusUrl !== undefined) payload.nucleus_url = nucleusUrl;
+        return this.request<OpenAssetResult>("asset.open", payload);
     }
 }

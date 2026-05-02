@@ -123,4 +123,43 @@ describe("InputChannel", () => {
             mdl_path: "omniverse://nucleus/foo.mdl",
         });
     });
+
+    it("openAsset sends asset.open with version + nucleus_url when provided", () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.openAsset("compass_step", 3, "omniverse://nucleus/DATE/assets/compass_step/v3/scene.usd").catch(() => {});
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame.command).toBe("asset.open");
+        expect(frame.payload).toEqual({
+            asset_id: "compass_step",
+            version: 3,
+            nucleus_url: "omniverse://nucleus/DATE/assets/compass_step/v3/scene.usd",
+        });
+    });
+
+    it("openAsset omits version + nucleus_url when not supplied", () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.openAsset("compass_step").catch(() => {});
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame.command).toBe("asset.open");
+        expect(frame.payload).toEqual({ asset_id: "compass_step" });
+    });
+
+    it("openAsset resolves the response result on ok", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.openAsset("compass_step", 1);
+
+        const reqId = JSON.parse(sentJson[0]).id;
+        const resultBody = {
+            asset_id: "compass_step",
+            nucleus_url: "omniverse://nucleus/DATE/assets/compass_step/v1/scene.usd",
+            open_request_acked: true as const,
+            version: 1,
+        };
+        ch.handleFrame({ id: reqId, ok: true, result: resultBody });
+
+        await expect(p).resolves.toEqual(resultBody);
+    });
 });

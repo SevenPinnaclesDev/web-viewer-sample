@@ -88,6 +88,33 @@ export interface SetOverridesBulkResult {
     skipped: BulkSkippedEntry[];
 }
 
+// ---- §6 reserved namespace `asset.*` --------------------------------------
+// Phase 1 close-the-loop (2026-05-01) — `asset.open` is the first command
+// in the asset.* namespace. The SPA fires it after the ingest pipeline's
+// `completed` lifecycle frame; the kit extension resolves the slug to a
+// Nucleus URL and asks omni.usd to open the stage. Once Kit's
+// StageEventType.OPENED fires, extension.py emits the §4.3 `asset.opened`
+// event and SwatchPanel auto-refreshes.
+
+export interface OpenAssetRequest {
+    asset_id: string;
+    /** Optional — when omitted the kit targets `<slug>/current/scene.usd`. */
+    version?: number;
+    /** Optional — full nucleus URL override. When supplied, kit trusts it
+     * verbatim and skips slug→URL resolution. The SPA can pull this
+     * straight off the ingest pipeline's `completed` frame's `nucleus_url`
+     * context value. */
+    nucleus_url?: string;
+}
+
+export interface OpenAssetResult {
+    asset_id: string;
+    nucleus_url: string;
+    open_request_acked: true;
+    /** Echoed back when the request specified an explicit version. */
+    version?: number;
+}
+
 // ---- spike fixture compatibility ------------------------------------------
 
 /** The 2026-04-30 spike fixture shape. Kept for the regression check at

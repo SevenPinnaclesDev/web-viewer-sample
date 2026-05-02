@@ -18,6 +18,7 @@ import USDStage from "./USDStage";
 import { headerHeight } from './App';
 import { InputChannel } from './services/inputChannel';
 import { SwatchPanel } from './components/swatch/SwatchPanel';
+import { DropZone } from './components/dragdrop/DropZone';
 
 
 interface USDAssetType {
@@ -469,6 +470,21 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     /**
+    * @function _ingestServiceUrl
+    *
+    * Resolve the DATE ingest service base URL. The ingest service runs
+    * at :49101 on the same host as the streaming server (per Phase 1.5
+    * D2-D5). For Phase 1 close-the-loop we derive it from the local
+    * stream config; future deployments will surface a separate config
+    * key when ingest moves off-box.
+    *  — Ryan, Phase 1 close-the-loop, 2026-05-01.
+    */
+    private _ingestServiceUrl(): string {
+        const host = StreamConfig.local?.server ?? "localhost";
+        return `https://${host}:49101`;
+    }
+
+    /**
     * @function _handleAppStreamFocus
     *
     * Update state when AppStream is in focus.
@@ -584,6 +600,21 @@ export default class App extends React.Component<AppProps, AppState> {
                             assetId={this._deriveAssetId(this.state.selectedUSDAsset)}
                         />
                     </div>
+
+                    {/*
+                      * DropZone — Phase 1 close-the-loop. Drag a file onto the
+                      * window, the SPA POSTs to the ingest service, watches the
+                      * lifecycle WS, and on `completed` fires asset.open over
+                      * the input channel — the streamed viewport switches
+                      * automatically. The overlay is full-screen but
+                      * pointer-events:none until a drag starts; it doesn't
+                      * disturb normal interaction.
+                      *  — Ryan, Phase 1 close-the-loop, 2026-05-01.
+                      */}
+                    <DropZone
+                        channel={this.state.showStream ? this._inputChannel : null}
+                        ingestServiceUrl={this._ingestServiceUrl()}
+                    />
                     </>
                 }
             </div>

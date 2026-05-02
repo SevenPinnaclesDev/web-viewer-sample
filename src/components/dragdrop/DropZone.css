@@ -1,0 +1,118 @@
+/*
+ * DropZone styles — full-screen overlay + bottom-right toast.
+ * Ryan Takeda — Phase 1 close-the-loop, 2026-05-01.
+ */
+
+.dropzone-host {
+    /* Capture drags across the whole window — the host renders at the
+     * top-level so its bounds match the viewport. */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none; /* let underlying UI receive clicks */
+    z-index: 1000;
+}
+
+/* When a drag is in progress, re-enable pointer events so the overlay
+ * actually sees dragover / drop. The .dropzone-overlay child handles
+ * the actual visual + drop-target. */
+.dropzone-host:has(.dropzone-overlay) {
+    pointer-events: auto;
+}
+
+.dropzone-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(20, 30, 45, 0.85);
+    border: 4px dashed #60c0ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 1001;
+}
+
+.dropzone-overlay-text {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.dropzone-overlay-subtext {
+    font-size: 13px;
+    font-weight: 400;
+    color: #c0d8ff;
+    margin-top: 12px;
+    max-width: 600px;
+}
+
+/* Toast — bottom-right corner. Stacks above other UI. */
+.dropzone-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    min-width: 300px;
+    max-width: 480px;
+    padding: 12px 36px 12px 16px;
+    background: #2a3140;
+    color: #f0f0f0;
+    border-left: 4px solid #60c0ff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+    z-index: 1002;
+    font-size: 13px;
+}
+
+.dropzone-toast-ok {
+    border-left-color: #44d77c;
+}
+
+.dropzone-toast-error {
+    border-left-color: #e35353;
+}
+
+.dropzone-toast-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.dropzone-toast-title code,
+.dropzone-toast-message code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+.dropzone-toast-message {
+    color: #c0c8d4;
+    line-height: 1.4;
+}
+
+.dropzone-toast-progress {
+    color: #c0d8ff;
+}
+
+.dropzone-toast-dismiss {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: 0;
+    color: #c0c8d4;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 8px;
+}
+
+.dropzone-toast-dismiss:hover {
+    color: #fff;
+}
