@@ -5,17 +5,23 @@
  *   - On mount, takes an InputChannel (already configured against AppStream's
  *     send/receive surface).
  *   - Manual "Refresh" button fires material.query_slots over the channel
- *     and renders the response. (Day 1 acceptance criterion 3 — auto-fire on
- *     `asset.opened` — is deferred to Day 2 when the server-side event lands;
- *     the manual button is the demo path.)
- *   - When the channel reports asset.opened (Day 2+), this component
- *     auto-refreshes. The subscription is wired today so it lights up
- *     for free when the server starts emitting.
+ *     and renders the response.
+ *   - asset.opened auto-refresh subscription is wired today; lights up for
+ *     free once the server emits (Day 2 contract §6).
+ *
+ * Phase 1 Day 2 (2026-05-01):
+ *   - Server now emits asset.opened (extension's StageEventType.OPENED hook).
+ *     The useEffect subscription below now fires `refresh()` on every
+ *     emission — the manual Refresh button stays as an explicit affordance
+ *     (force-reload after a Composer-side override was applied through a
+ *     non-DATE path, or pre-asset.opened diagnostic mode).
+ *   - The idle-state helper text updated to reflect that auto-refresh is
+ *     live, not "landing later."
  *
  * Loading / error / empty states all visible — no spinner-eats-the-screen
  * failures.
  *
- * Ryan Takeda — Phase 1 Day 1, 2026-05-01.
+ * Ryan Takeda — Phase 1 Day 1 + Day 2, 2026-05-01.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { InputChannel } from "../../services/inputChannel";
@@ -68,8 +74,10 @@ export function SwatchPanel({ channel, assetId }: SwatchPanelProps) {
 
     refreshFnRef.current = refresh;
 
-    // Day 2+ — auto-refresh on asset.opened. Wired today so the server can
-    // start firing it whenever Diana's ingest pipeline is ready.
+    // Auto-refresh on asset.opened. Day 2 (2026-05-01): the extension now
+    // emits this event on Kit's StageEventType.OPENED — see contract §6.
+    // The handler indirects through refreshFnRef so the subscription
+    // doesn't churn when assetId / channel change between renders.
     useEffect(() => {
         if (!channel) return;
         const unsubscribe = channel.onEvent("asset.opened", () => {
@@ -125,11 +133,12 @@ export function SwatchPanel({ channel, assetId }: SwatchPanelProps) {
 
             {state.kind === "idle" && (
                 <div className="swatch-panel-empty" data-testid="swatch-panel-idle">
-                    Press Refresh to fetch materials for <code>{assetId}</code>.
+                    Waiting for asset to load. Materials will populate
+                    automatically when the kit fires <code>asset.opened</code>.
                     <br />
                     <small>
-                        (Auto-refresh will land Day 2 when the server fires{" "}
-                        <code>asset.opened</code>.)
+                        Press Refresh to force a query against the live stage
+                        for <code>{assetId}</code>.
                     </small>
                 </div>
             )}

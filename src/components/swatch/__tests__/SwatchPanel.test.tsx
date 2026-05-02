@@ -105,4 +105,49 @@ describe("SwatchPanel", () => {
         render(<SwatchPanel channel={ch} assetId="compass_step" />);
         expect(onEvent).toHaveBeenCalledWith("asset.opened", expect.any(Function));
     });
+
+    it("Day 2 acceptance criterion 3: asset.opened auto-fires queryMaterialSlots", async () => {
+        // Capture the asset.opened handler the panel registers, then invoke
+        // it as the channel would. queryMaterialSlots should be called and
+        // the panel should render the slot list without a manual button click.
+        let openedHandler: ((evt: { event: string; payload: unknown }) => void) | null = null;
+        const onEvent = vi.fn((name: string, handler: unknown) => {
+            if (name === "asset.opened") {
+                openedHandler = handler as (e: { event: string; payload: unknown }) => void;
+            }
+            return () => {};
+        });
+        const result: QuerySlotsResult = {
+            asset_id: "compass_step",
+            slots: [{
+                slot_id: "Diffuse@compass_step",
+                source_name: "Diffuse",
+                display_name: "Body227",
+                placeholder_color: [1.0, 0.63, 0.0],
+                bound_prim_count: 7,
+                bound_body_names: ["Body227"],
+                is_overridden: false,
+                current_mdl_path: null,
+            }],
+        };
+        const queryMaterialSlots = vi.fn().mockResolvedValue(result);
+        const ch = makeMockChannel({ onEvent, queryMaterialSlots });
+        render(<SwatchPanel channel={ch} assetId="compass_step" />);
+
+        // Pre-condition: idle, no slots rendered yet.
+        expect(screen.getByTestId("swatch-panel-idle")).toBeInTheDocument();
+        expect(queryMaterialSlots).not.toHaveBeenCalled();
+
+        // Server emits asset.opened — simulate by invoking the registered handler.
+        expect(openedHandler).not.toBeNull();
+        openedHandler!({
+            event: "asset.opened",
+            payload: { asset_id: "compass_step", loaded_at: "2026-05-01T19:00:00+00:00" },
+        });
+
+        // queryMaterialSlots gets called for the open asset, slot list renders.
+        expect(queryMaterialSlots).toHaveBeenCalledWith("compass_step");
+        await waitFor(() => expect(screen.getByTestId("slot-list")).toBeInTheDocument());
+        expect(screen.getByText("Body227")).toBeInTheDocument();
+    });
 });

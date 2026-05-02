@@ -15,6 +15,13 @@ export default defineConfig({
         environment: "jsdom",
         globals: false,
         include: ["src/**/__tests__/*.{test,spec}.{ts,tsx}"],
-        setupFiles: [],
+        // Day 2 fix: cleanup between tests so renders don't accumulate.
+        // The setup file calls @testing-library/react's cleanup() in
+        // afterEach. Without this, Day 1's tests pass alone but fail
+        // in batch (multiple data-testid matches in the leaked DOM from
+        // the prior test's render). The include pattern above only matches
+        // *.test.* / *.spec.* under __tests__/, so setup.ts is naturally
+        // out of the test-discovery glob.
+        setupFiles: ["./src/__tests__/setup.ts"],
     },
 });
