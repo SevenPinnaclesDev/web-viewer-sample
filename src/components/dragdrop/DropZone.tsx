@@ -115,16 +115,26 @@ export function DropZone({
     // when an iCloud-folder drop hits "completed"), fire asset.open
     // directly. Same kit-side handler the in-page drop's onCompleted
     // uses. Fires once per channel-becomes-ready transition.
+    //
+    // The daemon also passes `?nucleus_url=<full omniverse:// url>` from
+    // the lifecycle's completed frame. We forward it verbatim to
+    // `openAsset` so the kit-side `resolve_asset_url` returns it
+    // unchanged — this bypasses slug→path derivation, which is brittle
+    // because (a) daemon and worker slugifiers can diverge (kebab-case
+    // vs underscore), and (b) the file extension is pipeline-dependent
+    // (`.usd` for Hoops/IFC, `.usdz` for passthrough). The completed
+    // frame is the authoritative source of the canonical Nucleus URL.
     const urlAssetFiredRef = useRef(false);
     useEffect(() => {
         if (urlAssetFiredRef.current || !channel) return;
         const params = new URLSearchParams(window.location.search);
         const slug = params.get("asset");
+        const nucleusUrl = params.get("nucleus_url") || undefined;
         if (!slug) return;
         urlAssetFiredRef.current = true;
         setToast({ kind: "loading", filename: slug, assetId: slug });
-        channel.openAsset(slug).then(() => {
-            setToast({ kind: "loaded", filename: slug, assetId: slug, nucleusUrl: "" });
+        channel.openAsset(slug, undefined, nucleusUrl).then(() => {
+            setToast({ kind: "loaded", filename: slug, assetId: slug, nucleusUrl: nucleusUrl ?? "" });
         }).catch((err: unknown) => {
             setToast({
                 kind: "failed",
