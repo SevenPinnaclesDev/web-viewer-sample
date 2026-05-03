@@ -127,12 +127,31 @@ export default class App extends React.Component<AppProps, AppState> {
     /**
      * @function _onStreamStarted
      *
-     * Sends a request to open an asset. If the stream is from GDN it is assumed that the
-     * application will automatically load an asset on startup so a request to open a stage
-     * is not sent. Instead, we wait for the streamed application to send a
-     * openedStageResult message.
+     * Fires when AppStream's WebRTC pipe is up. Two paths from here:
+     *
+     *   - USD Viewer template path (legacy): poll kit for loading state;
+     *     when kit reports stage-loaded with `loading_state: "idle"`,
+     *     line 396 sets `showStream: true, showUI: true` and the SPA's
+     *     wrapping panels (USDAsset / USDStage / SwatchPanel) appear.
+     *
+     *   - DATE / generic-Composer path: the streamed kit app may not be
+     *     the USD Viewer template (Composer, for example, doesn't send
+     *     `openedStageResult`). For DropZone's URL handler to fire when
+     *     the daemon opens `?asset=…&nucleus_url=…`, we need `channel`
+     *     non-null as soon as the WebRTC pipe is up — that requires
+     *     `showStream: true` here, not gated on the kit-side protocol.
+     *     DropZone is mounted outside the `showUI` block so it doesn't
+     *     wait for the USD Viewer template's asset-loaded event either.
+     *     The other SPA panels (which query the USD Viewer template's
+     *     custom events) stay gated on `showUI` and remain hidden when
+     *     the streamed kit isn't that template — correctly.
      */
         private _onStreamStarted(): void {
+            // DATE customer-zero path: open the input_channel as soon as
+            // the WebRTC pipe is up, so DropZone's URL handler can fire
+            // an `asset.open` from `?asset=…&nucleus_url=…` regardless
+            // of which kit application is streaming.
+            this.setState({ showStream: true });
             this._pollForKitReady()
         }
 
@@ -601,22 +620,32 @@ export default class App extends React.Component<AppProps, AppState> {
                         />
                     </div>
 
-                    {/*
-                      * DropZone — Phase 1 close-the-loop. Drag a file onto the
-                      * window, the SPA POSTs to the ingest service, watches the
-                      * lifecycle WS, and on `completed` fires asset.open over
-                      * the input channel — the streamed viewport switches
-                      * automatically. The overlay is full-screen but
-                      * pointer-events:none until a drag starts; it doesn't
-                      * disturb normal interaction.
-                      *  — Ryan, Phase 1 close-the-loop, 2026-05-01.
-                      */}
-                    <DropZone
-                        channel={this.state.showStream ? this._inputChannel : null}
-                        ingestServiceUrl={this._ingestServiceUrl()}
-                    />
                     </>
                 }
+
+                {/*
+                  * DropZone — Phase 1 close-the-loop. Drag a file onto the
+                  * window, the SPA POSTs to the ingest service, watches the
+                  * lifecycle WS, and on `completed` fires asset.open over
+                  * the input channel — the streamed viewport switches
+                  * automatically. The overlay is full-screen but
+                  * pointer-events:none until a drag starts; it doesn't
+                  * disturb normal interaction.
+                  *
+                  * Mounted OUTSIDE the showUI block (and the USDAsset/
+                  * USDStage/SwatchPanel siblings) because those panels are
+                  * specific to the USD Viewer kit template's protocol —
+                  * they wait for kit's openedStageResult event to set
+                  * showUI=true. DropZone needs to work against any
+                  * streamed kit (Composer, USD Viewer, …), so it gates
+                  * only on showStream and channel non-null. Marcus +
+                  * Ryan, 2026-05-03 customer-zero loop fix.
+                  *  — Ryan, Phase 1 close-the-loop, 2026-05-01.
+                  */}
+                <DropZone
+                    channel={this.state.showStream ? this._inputChannel : null}
+                    ingestServiceUrl={this._ingestServiceUrl()}
+                />
             </div>
             );
         }
