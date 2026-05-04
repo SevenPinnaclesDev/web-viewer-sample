@@ -107,28 +107,22 @@ const DEFAULT_LIBRARY_ROOT_URL =
 
 const MAX_RECENTLY_USED = 8;
 
-function fuzzyIncludes(haystack: string, needle: string): boolean {
-    // Cheap fuzzy: every char of needle appears in haystack in order.
-    // Empty needle always matches. Case-insensitive.
+function caseInsensitiveIncludes(haystack: string, needle: string): boolean {
+    // Substring match — the right default for a picker. We tried full
+    // fuzzy (every char in order) first; it matches too eagerly at v1
+    // library size (e.g. "abs" → "Aluminum_Brushed" via a-?-?-b-?-s).
+    // If a Twin Architect asks for fuzzy later, gate it behind a
+    // search-mode toggle.
     if (!needle) return true;
-    const h = haystack.toLowerCase();
-    const n = needle.toLowerCase();
-    let i = 0;
-    for (const c of h) {
-        if (c === n[i]) i++;
-        if (i >= n.length) return true;
-    }
-    // Substring fallback handles the common "exact substring" case where
-    // fuzzy ordering isn't quite right but the substring is right there.
-    return h.includes(n);
+    return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
 function materialMatchesSearch(m: LibraryMaterialEntry, query: string): boolean {
     if (!query) return true;
-    if (fuzzyIncludes(m.filename, query)) return true;
-    if (fuzzyIncludes(m.display_name, query)) return true;
+    if (caseInsensitiveIncludes(m.filename, query)) return true;
+    if (caseInsensitiveIncludes(m.display_name, query)) return true;
     for (const t of m.tags) {
-        if (fuzzyIncludes(t, query)) return true;
+        if (caseInsensitiveIncludes(t, query)) return true;
     }
     return false;
 }
