@@ -14,6 +14,7 @@ import AppStream from './AppStream';
 import { AppProps } from './Window';
 import { headerHeight } from './App';
 import { DropZone } from './components/dragdrop/DropZone';
+import { AssetBrowser } from './components/assetbrowser/AssetBrowser';
 import { InputChannel } from './services/inputChannel';
 import StreamConfig from '../stream.config.json';
 
@@ -147,6 +148,17 @@ export default class StreamOnly extends React.Component<AppProps, StreamOnlyStat
                   * Channel is gated on showStream so it only sends after
                   * WebRTC is up. */}
                 <DropZone
+                    channel={this.state.showStream ? this._inputChannel : null}
+                    ingestServiceUrl={this._ingestServiceUrl()}
+                />
+
+                {/* Asset Browser — collapsible left-sidebar Finder over the
+                  * Nucleus library. Default-collapsed so the streaming view
+                  * is full-width by default; expand to pick + load any
+                  * previously-ingested asset without re-dropping. Same
+                  * channel + ingest URL as DropZone (one truth per
+                  * deployment). */}
+                <AssetBrowser
                     channel={this.state.showStream ? this._inputChannel : null}
                     ingestServiceUrl={this._ingestServiceUrl()}
                 />
