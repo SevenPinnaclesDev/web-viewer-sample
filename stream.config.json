@@ -14,9 +14,9 @@
         "cmsId": 0
     },
     "local": {
-        "$comment": "DATE Phase 0 — connects to omni-composer-streaming on DASB256 over Tailscale.",
+        "$comment": "DATE Phase 0.5 — defaults to date-viewer-streaming on :49102 (clean customer-facing kit-app build, no Composer authoring chrome). For Composer (the Twin Architect's authoring tool) use ?stream_port=49100 query-param escape hatch.",
         "server": "dasb256.tailcb8137.ts.net",
-        "signalingPort": 49100,
+        "signalingPort": 49102,
         "mediaPort": null
     }
 }
