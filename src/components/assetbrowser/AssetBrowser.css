@@ -1,0 +1,264 @@
+/*
+ * AssetBrowser styles — collapsible left-sidebar panel over the stream.
+ *
+ * Layout intent: ~280px wide when expanded, full-height, semi-transparent
+ * dark backdrop so the streamed viewport is visible behind the panel.
+ * A floating toggle button at top-left both opens the collapsed panel
+ * and lives inside the panel header to close it.
+ *
+ * Default state: collapsed (just the toggle pill at top-left). The user
+ * opens the panel deliberately, so the streaming view is full-width by
+ * default and stays unobstructed for normal use.
+ *
+ * Ryan Takeda — Asset Browser sprint, 2026-05-02.
+ */
+
+.asset-browser-host {
+    /* Fixed-position so the panel anchors to the streaming canvas
+     * regardless of parent layout. The host itself is invisible — the
+     * toggle and panel are the only visible children. */
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1100; /* above DropZone overlay's host (1000) but below toast (1002) */
+    pointer-events: none; /* the panel + toggle re-enable as needed */
+}
+
+/* Floating toggle pill — always present at top-left when panel collapsed,
+ * absorbed into the panel header when expanded. */
+.asset-browser-toggle {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(42, 49, 64, 0.92);
+    color: #f0f0f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.asset-browser-toggle:hover {
+    background: rgba(60, 70, 90, 0.95);
+}
+
+.asset-browser-toggle-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Panel — slides in from the left when expanded. */
+.asset-browser-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    background: rgba(20, 24, 32, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #f0f0f0;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.asset-browser-header {
+    flex: 0 0 auto;
+    padding: 12px 12px 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.asset-browser-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.asset-browser-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0f0f0;
+}
+
+.asset-browser-icon-button {
+    background: transparent;
+    border: 0;
+    color: #c0c8d4;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.asset-browser-icon-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.asset-browser-search {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+    padding: 6px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    outline: none;
+}
+
+.asset-browser-search:focus {
+    border-color: #60c0ff;
+}
+
+.asset-browser-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Asset card — single click loads the asset. */
+.asset-browser-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 10px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    transition: background 100ms, border-color 100ms;
+}
+
+.asset-browser-card:hover {
+    background: rgba(96, 192, 255, 0.12);
+    border-color: rgba(96, 192, 255, 0.4);
+}
+
+.asset-browser-card:focus-visible {
+    outline: 2px solid #60c0ff;
+    outline-offset: 1px;
+}
+
+.asset-browser-card-loading {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.asset-browser-card-slug {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0f0f0;
+    word-break: break-all;
+}
+
+.asset-browser-card-meta {
+    font-size: 11px;
+    color: #a0a8b4;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.asset-browser-card-format {
+    text-transform: uppercase;
+    background: rgba(96, 192, 255, 0.18);
+    color: #b0d8ff;
+    padding: 1px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+}
+
+.asset-browser-loading,
+.asset-browser-error,
+.asset-browser-empty {
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #c0c8d4;
+}
+
+.asset-browser-error {
+    color: #ffb0b0;
+}
+
+.asset-browser-empty-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 6px;
+}
+
+.asset-browser-empty-message {
+    font-size: 12px;
+    color: #a0a8b4;
+    line-height: 1.4;
+}
+
+.asset-browser-retry {
+    margin-top: 8px;
+    background: rgba(96, 192, 255, 0.18);
+    border: 1px solid rgba(96, 192, 255, 0.4);
+    color: #b0d8ff;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.asset-browser-retry:hover {
+    background: rgba(96, 192, 255, 0.25);
+}
+
+/* Mini-toast inside the panel — surface load result without colliding
+ * with DropZone's full-screen toast. */
+.asset-browser-toast {
+    flex: 0 0 auto;
+    margin: 0 8px 8px 8px;
+    padding: 8px 28px 8px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    background: #2a3140;
+    color: #f0f0f0;
+    border-left: 3px solid #60c0ff;
+    position: relative;
+    line-height: 1.4;
+}
+
+.asset-browser-toast-ok { border-left-color: #44d77c; }
+.asset-browser-toast-error { border-left-color: #e35353; color: #ffd0d0; }
+
+.asset-browser-toast-dismiss {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    background: transparent;
+    border: 0;
+    color: #c0c8d4;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 6px;
+}
