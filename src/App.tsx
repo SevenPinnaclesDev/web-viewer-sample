@@ -22,7 +22,8 @@ import "./App.css";
 import Window from './Window';
 import StreamOnlyWindow from './StreamOnlyWindow';
 import { Application, AppOnlyForm, ServerURLsForm, ApplicationsForm, VersionsForm, ProfilesForm } from "./Forms"
-import LogoImage from './assets/nvidia_logo.png';
+// (NVIDIA logo removed — DATE-branded header per Jim 2026-05-04;
+//  parent-company brand decision deferred so this stays neutral.)
 import StreamConfig from '../stream.config.json';
 import {
     getStreamingSessionInfo,
@@ -272,9 +273,9 @@ class App extends Component<{}, AppState>{
 
             {/* Header */}
             <div className="header-bar">
-                <img src={LogoImage} alt="Logo" className="header-logo" />
-                    <span className="header-title">Omniverse Embedded Web Viewer Example</span>
-                </div>
+                <span className="header-title" style={{ fontWeight: 700, fontSize: 22, letterSpacing: '0.04em' }}>DATE</span>
+                <span className="header-subtitle" style={{ marginLeft: 12, opacity: 0.65, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Digital Accelerated Twin Engine</span>
+            </div>
 
             { /* End Stream button */}
             {StreamConfig.source === "stream" &&
