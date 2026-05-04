@@ -76,8 +76,16 @@ class App extends Component<{}, AppState>{
     constructor(props: {}) {
         super(props);
         this.state = {
-            currentForm: Forms.AppOnly,
-            useWebUI: true,
+            // DATE deployment skips the upstream AppOnlyForm "UI Option" screen
+            // (NVIDIA's reference-app onboarding for picking USD-Viewer-template-UI
+            // vs any-streaming-app-UI). For DATE the answer is always "any
+            // streaming app" — we wrap Composer / USD Explorer / future custom
+            // DATE viewers, none of which speak the USD Viewer template's
+            // openedStageResult protocol. Going straight to Forms.Stream with
+            // useWebUI=false renders StreamOnlyWindow on first load, which
+            // carries our DropZone + InputChannel wiring. — Marcus, 2026-05-03.
+            currentForm: Forms.Stream,
+            useWebUI: false,
             streamServer: StreamConfig.stream.streamServer,
             appServer: StreamConfig.stream.appServer,
             applications: [],
@@ -105,8 +113,11 @@ class App extends Component<{}, AppState>{
     */
     private _resetState() {
         this.setState({
-            currentForm: Forms.AppOnly,
-            useWebUI: true,
+            // Mirror constructor: skip AppOnlyForm on reset too, go straight
+            // back to Stream + StreamOnlyWindow. End-Stream → reset → reconnect
+            // is one click instead of two.
+            currentForm: Forms.Stream,
+            useWebUI: false,
             streamServer: StreamConfig.stream.streamServer,
             appServer: StreamConfig.stream.appServer,
             applications: [],
