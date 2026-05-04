@@ -82,16 +82,32 @@ export default class AppStream extends Component<AppStreamProps, AppStreamState>
 
             else if (StreamConfig.source === 'local') {
                 streamSource = StreamType.DIRECT;
+                // Phase-0.5 escape hatch: ?stream_port=<n> in the page URL overrides
+                // StreamConfig.local.signalingPort. Lets us A/B between the Composer
+                // streaming target (49100, default) and the new DATE Viewer kit-app
+                // streaming target (49102) without rebuilding stream.config.json.
+                // Drop the override in any non-numeric case (silent fallback to config).
+                const _streamPortParam = new URLSearchParams(window.location.search).get('stream_port');
+                const _streamPortOverride = _streamPortParam && /^\d+$/.test(_streamPortParam)
+                    ? Number(_streamPortParam)
+                    : null;
+                const _signalingPort = _streamPortOverride ?? StreamConfig.local.signalingPort;
+                if (_streamPortOverride !== null) {
+                    console.info(`[DATE] stream_port query-param override: signalingPort=${_signalingPort} (config default was ${StreamConfig.local.signalingPort})`);
+                }
+
                 streamConfig = {
                     videoElementId: 'remote-video',
                     audioElementId: 'remote-audio',
                     // DATE Phase 0: substrate fronted by Caddy with Tailscale-issued Let's Encrypt
                     // cert at wss://dasb256.tailcb8137.ts.net:49100 → kit ws://127.0.0.1:49099.
+                    // Phase 0.5 (2026-05-03): a parallel DATE Viewer kit-app streams on :49102 → :49098;
+                    // selectable via ?stream_port=49102 query param (computed above).
                     // authenticate:true → appLevelProtocol=5 (wss); matches our TLS-terminated substrate.
                     authenticate: true,
                     maxReconnects: 20,
                     signalingServer: StreamConfig.local.server,
-                    signalingPort: StreamConfig.local.signalingPort,
+                    signalingPort: _signalingPort,
                     mediaServer: StreamConfig.local.server,
                     ...(StreamConfig.local.mediaPort != null && { mediaPort: StreamConfig.local.mediaPort }),
                     nativeTouchEvents: true,
