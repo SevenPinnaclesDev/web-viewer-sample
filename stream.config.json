@@ -14,9 +14,9 @@
         "cmsId": 0
     },
     "local": {
-        "$comment": "DATE Phase 0.5 — defaults to omni-composer-streaming on :49100 (proven WebRTC video path). DATE Viewer on :49102 streams data channel (asset.open works) but video track silent — kit-app-template livestream 10.x vs SPA streaming-library 5.6.0 (built for livestream 9.x) compat issue under investigation. Use ?stream_port=49102 for DATE Viewer once video is unblocked.",
+        "$comment": "DATE Phase 0.5+ — defaults to date-viewer-streaming on :49102 (clean customer-facing kit-app). mfo.date_viewer.environment extension (commit f712e12) closes the empty-stage rendering: DistantLight + auto-frame on ASSETS_LOADED so dropped/picked assets render lit and centered. Use ?stream_port=49100 for Composer (the Twin Architect's authoring tool).",
         "server": "dasb256.tailcb8137.ts.net",
-        "signalingPort": 49100,
+        "signalingPort": 49102,
         "mediaPort": null
     }
 }
