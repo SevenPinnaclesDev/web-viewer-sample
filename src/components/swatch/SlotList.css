@@ -116,6 +116,21 @@
 .slot-row.is-overridden { background: rgba(196, 167, 110, 0.08); }
 .slot-row:hover { background: #232323; }
 .slot-row.is-overridden:hover { background: rgba(196, 167, 110, 0.15); }
+.slot-row.is-selected {
+    background: rgba(96, 192, 255, 0.10);
+    border-left: 3px solid #60c0ff;
+    padding-left: 11px;
+}
+.slot-row.is-selected:hover { background: rgba(96, 192, 255, 0.18); }
+
+.slot-row-check {
+    margin-top: 11px;
+    cursor: pointer;
+    accent-color: #60c0ff;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
 
 .swatch {
     width: 36px;

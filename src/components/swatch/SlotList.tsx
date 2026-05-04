@@ -9,20 +9,15 @@
  * is *already* one logical scope), but "group by color" stays — Elena's
  * ask #1 ("all the orange parts").
  *
- * What's gone vs. spike:
- *   - is_in_prototypes badge (server-side consolidation eats this distinction)
- *   - "group by scope" (consolidation makes it a no-op)
- *   - duplicate_color_clusters callout in header (was a spike-only
- *     diagnostic to surface the prototype-instancing pattern; with
- *     consolidation done server-side, the cluster count drops to <=N
- *     logical and is no longer a usability win)
+ * Phase 1 picker sprint (2026-05-02):
+ *   - Optional bulk-select via per-row checkboxes. The parent owns the
+ *     selection set; SlotList stays controlled. When `selectedSlotIds`
+ *     is undefined the checkbox column is hidden — this keeps the
+ *     spike-fixture regression path checkbox-free.
+ *   - `onSlotPick` callback fires on slot-row click (single-pick path)
+ *     or via a "pick for N selected" parent button (bulk path).
  *
- * What's new:
- *   - is_overridden indicator on the row (Day 2+ shows current MDL)
- *   - render from a `slots: MaterialSlot[]` array directly; the parent
- *     owns loading state
- *
- * Ryan Takeda — Phase 1 Day 1, 2026-05-01.
+ * Ryan Takeda — Phase 1 Day 1 + picker sprint, 2026-05-01 / 2026-05-02.
  */
 import { useMemo, useState } from "react";
 import type { MaterialSlot } from "../../services/inputChannelTypes";
@@ -35,9 +30,21 @@ export interface SlotListProps {
     /** Asset slug, shown in the header. Optional — when called from a
      * regression-check path with synthesized fixtures, may be absent. */
     assetId?: string;
-    /** Optional click handler — Day 2+ wires this to open the MDL picker.
-     * Day 1: not used. */
+    /** Legacy click handler (spike fixture viewer). Picker sprint
+     * supersedes with `onSlotPick`. */
     onSelect?: (slot: MaterialSlot) => void;
+
+    /** Picker sprint: fires when the user clicks a slot row (or the row's
+     * "edit" affordance — currently the swatch). Parent opens the MDL
+     * picker for this single slot. When omitted, slot rows are not
+     * clickable for picking. */
+    onSlotPick?: (slot: MaterialSlot) => void;
+
+    /** Picker sprint bulk-select. When set, per-row checkboxes appear
+     * and the parent owns the selection state. Pass undefined to hide
+     * the checkbox column entirely. */
+    selectedSlotIds?: Set<string>;
+    onSelectionChange?: (next: Set<string>) => void;
 }
 
 function rgbCss(c: [number, number, number] | null): string {
@@ -51,7 +58,29 @@ function colorKey(c: [number, number, number] | null): string {
     return c.map((v) => v.toFixed(3)).join(",");
 }
 
-export function SlotList({ slots, assetId, onSelect }: SlotListProps) {
+export function SlotList({
+    slots,
+    assetId,
+    onSelect,
+    onSlotPick,
+    selectedSlotIds,
+    onSelectionChange,
+}: SlotListProps) {
+    const showCheckboxes = selectedSlotIds !== undefined && onSelectionChange !== undefined;
+    const toggleSelected = (slotId: string) => {
+        if (!showCheckboxes) return;
+        const next = new Set(selectedSlotIds);
+        if (next.has(slotId)) next.delete(slotId);
+        else next.add(slotId);
+        onSelectionChange!(next);
+    };
+    // Click handlers per row: prefer onSlotPick; fall back to the legacy
+    // onSelect callback if a caller is still using it. Picker sprint
+    // callers pass onSlotPick.
+    const handleRowClick = (slot: MaterialSlot) => {
+        if (onSlotPick) return onSlotPick(slot);
+        if (onSelect) return onSelect(slot);
+    };
     const [filter, setFilter] = useState("");
     const [group, setGroup] = useState<GroupMode>("none");
     const [showOnlyBound, setShowOnlyBound] = useState(false);
@@ -160,15 +189,29 @@ export function SlotList({ slots, assetId, onSelect }: SlotListProps) {
                         )}
                         {g.slots.map((slot) => {
                             const sampleBodies = slot.bound_body_names;
+                            const clickable = Boolean(onSlotPick || onSelect);
+                            const isSelected = showCheckboxes && selectedSlotIds!.has(slot.slot_id);
                             return (
                                 <div
                                     key={slot.slot_id}
                                     data-testid="slot-row"
                                     data-slot-id={slot.slot_id}
-                                    className={`slot-row ${slot.bound_prim_count === 0 ? "is-unbound" : ""} ${slot.is_overridden ? "is-overridden" : ""}`}
-                                    onClick={onSelect ? () => onSelect(slot) : undefined}
-                                    style={onSelect ? { cursor: "pointer" } : undefined}
+                                    className={`slot-row ${slot.bound_prim_count === 0 ? "is-unbound" : ""} ${slot.is_overridden ? "is-overridden" : ""} ${isSelected ? "is-selected" : ""}`}
+                                    onClick={clickable ? () => handleRowClick(slot) : undefined}
+                                    style={clickable ? { cursor: "pointer" } : undefined}
                                 >
+                                    {showCheckboxes && (
+                                        <input
+                                            type="checkbox"
+                                            className="slot-row-check"
+                                            data-testid="slot-row-check"
+                                            data-slot-id={slot.slot_id}
+                                            checked={isSelected}
+                                            onChange={() => toggleSelected(slot.slot_id)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            aria-label={`Select ${slot.display_name}`}
+                                        />
+                                    )}
                                     <div
                                         className="swatch"
                                         style={{ background: rgbCss(slot.placeholder_color) }}

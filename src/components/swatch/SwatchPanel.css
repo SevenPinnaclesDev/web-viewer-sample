@@ -87,3 +87,73 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+/* Picker sprint (2026-05-02): bulk-pick action surfaces in the header
+ * when the user has slots multi-selected via SlotList checkboxes. */
+.swatch-panel-bulk-pick {
+    margin-left: auto;
+    padding: 4px 12px;
+    background: #2c3848;
+    color: inherit;
+    border: 1px solid #60c0ff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.swatch-panel-bulk-pick:hover {
+    background: #354a60;
+}
+
+/* Apply-toast — bottom-right corner. Shape mirrors DropZone toast for
+ * visual consistency, lives in the SwatchPanel surface so it stacks
+ * correctly above the SlotList. */
+.swatch-panel-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    min-width: 280px;
+    max-width: 460px;
+    padding: 12px 36px 12px 16px;
+    background: #2a3140;
+    color: #f0f0f0;
+    border-left: 4px solid #60c0ff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+    z-index: 1500;
+    font-size: 13px;
+    font-family: Inter, system-ui, sans-serif;
+}
+.swatch-panel-toast-ok { border-left-color: #44d77c; }
+.swatch-panel-toast-error { border-left-color: #e35353; }
+
+.swatch-panel-toast-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.swatch-panel-toast-title code,
+.swatch-panel-toast-message code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+.swatch-panel-toast-message {
+    color: #c0c8d4;
+    line-height: 1.4;
+}
+.swatch-panel-toast-dismiss {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: 0;
+    color: #c0c8d4;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 8px;
+}
+.swatch-panel-toast-dismiss:hover {
+    color: #fff;
+}
