@@ -115,6 +115,47 @@ export interface OpenAssetResult {
     version?: number;
 }
 
+// ---- §6 reserved namespace `library.*` ------------------------------------
+// Picker sprint (2026-05-02) — `library.list_materials` is the first command
+// in the library.* namespace. The SPA picker fires it on first open,
+// caches the catalog in component-level state for the session.
+//
+// Catalog shape mirrors what tools/library-curator's `build` writes (see
+// tools/library-curator/README.md "Catalog shape decisions") and matches
+// clients/web/design/picker-ui-v1.md "Library structure on Nucleus".
+
+export interface LibraryMaterialEntry {
+    /** MDL filename (basename, including .mdl). */
+    filename: string;
+    /** Human-readable name shown in the picker grid + recently-used row. */
+    display_name: string;
+    /** Author-supplied tags — picker's search box matches against these. */
+    tags: string[];
+    /** Sibling thumbnail filename (relative to the category dir), or null
+     * when the curator flagged it as missing. Picker renders a placeholder
+     * swatch when null. */
+    thumbnail: string | null;
+    author: string;
+    /** ISO date YYYY-MM-DD. */
+    author_date: string;
+}
+
+export interface LibraryCategory {
+    /** POSIX-style relative path from the library root, e.g. "Metals" or
+     * "Plastics/ABS". The picker's folder tree mirrors this path. */
+    path: string;
+    /** Title-cased category name shown in the tree. */
+    display_name: string;
+    materials: LibraryMaterialEntry[];
+}
+
+export interface LibraryCatalog {
+    /** Curator-stamped version. Default is today's date in YYYY-MM-DD;
+     * Elena may override with semver or deployment-tagged values. */
+    library_version: string;
+    categories: LibraryCategory[];
+}
+
 // ---- spike fixture compatibility ------------------------------------------
 
 /** The 2026-04-30 spike fixture shape. Kept for the regression check at

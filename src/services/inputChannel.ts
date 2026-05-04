@@ -25,6 +25,7 @@
 import type {
     ChannelRequest,
     ChannelEvent,
+    LibraryCatalog,
     OpenAssetRequest,
     OpenAssetResult,
     QuerySlotsResult,
@@ -278,5 +279,27 @@ export class InputChannel {
         if (version !== undefined) payload.version = version;
         if (nucleusUrl !== undefined) payload.nucleus_url = nucleusUrl;
         return this.request<OpenAssetResult>("asset.open", payload);
+    }
+
+    /**
+     * Picker sprint (2026-05-02): fetch the MDL library catalog from
+     * Nucleus. The kit extension reads metadata.json off
+     * `omniverse://nucleus.<deployment>/DATE/Library/Materials/` via
+     * omni.client and returns the parsed catalog.
+     *
+     * The MDL Picker calls this on first open and caches the result in
+     * component-level state for the session — re-fetch is via an explicit
+     * refresh action (manual page reload at v1; in-component refresh
+     * button is v1.5).
+     *
+     * Errors per the kit-side handler:
+     *  - `library_not_found` — catalog file missing on Nucleus (curator
+     *    hasn't been run, or wrong library path)
+     *  - `library_parse_error` — catalog malformed (curator bug, or
+     *    out-of-band edit corrupted the file)
+     *  - `kit_internal` — anything else (transport, omni.client errors)
+     */
+    listLibraryMaterials(): Promise<LibraryCatalog> {
+        return this.request<LibraryCatalog>("library.list_materials", {});
     }
 }
