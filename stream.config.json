@@ -14,9 +14,9 @@
         "cmsId": 0
     },
     "local": {
-        "$comment": "DATE Phase 0.5 — defaults to date-viewer-streaming on :49102 (clean customer-facing kit-app build, no Composer authoring chrome). For Composer (the Twin Architect's authoring tool) use ?stream_port=49100 query-param escape hatch.",
+        "$comment": "DATE Phase 0.5 — defaults to omni-composer-streaming on :49100 (proven WebRTC video path). DATE Viewer on :49102 streams data channel (asset.open works) but video track silent — kit-app-template livestream 10.x vs SPA streaming-library 5.6.0 (built for livestream 9.x) compat issue under investigation. Use ?stream_port=49102 for DATE Viewer once video is unblocked.",
         "server": "dasb256.tailcb8137.ts.net",
-        "signalingPort": 49102,
+        "signalingPort": 49100,
         "mediaPort": null
     }
 }
