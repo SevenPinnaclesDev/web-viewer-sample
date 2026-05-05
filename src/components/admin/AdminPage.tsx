@@ -131,6 +131,7 @@ export function AdminPage({
     if (currentUser.role !== "admin") {
         return (
             <div className="admin-page" data-testid="admin-page">
+                <AdminPageHeader />
                 <div className="admin-page-inner">
                     <div className="admin-empty-card" data-testid="admin-page-not-admin">
                         <div className="admin-empty-title">No admin access</div>
@@ -153,6 +154,7 @@ export function AdminPage({
 
     return (
         <div className="admin-page" data-testid="admin-page">
+            <AdminPageHeader />
             <div className="admin-page-inner">
                 <div className="admin-page-toolbar">
                     <div className="admin-page-tabs" role="tablist">
@@ -216,6 +218,21 @@ export function AdminPage({
                     autoDismissMs={inviteAutoDismissMs}
                 />
             )}
+        </div>
+    );
+}
+
+
+// ---- Admin page header --------------------------------------------------
+
+function AdminPageHeader() {
+    return (
+        <div className="admin-page-header" data-testid="admin-page-header">
+            <span className="admin-page-header-title">DATE</span>
+            <span className="admin-page-header-subtitle">Admin</span>
+            <a className="admin-page-header-back" href="/" data-testid="admin-page-header-back">
+                ← Back to streaming
+            </a>
         </div>
     );
 }

@@ -34,12 +34,14 @@ describe("getWhoAmI", () => {
             email: "elena@mfo.example",
             role: "admin",
             display_name: "Elena Reyes",
+            user_id: "u-1",
         }));
         const user = await getWhoAmI({ fetchFn: fetchSpy as unknown as typeof fetch });
         expect(user).toEqual({
             email: "elena@mfo.example",
             role: "admin",
             display_name: "Elena Reyes",
+            user_id: "u-1",
         });
         const calledUrl = fetchSpy.mock.calls[0][0] as string;
         expect(calledUrl).toContain("/auth/whoami");

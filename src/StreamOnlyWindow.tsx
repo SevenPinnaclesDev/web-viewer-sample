@@ -16,6 +16,8 @@ import { headerHeight } from './App';
 import { DropZone } from './components/dragdrop/DropZone';
 import { AssetBrowser } from './components/assetbrowser/AssetBrowser';
 import { ViewportPickHandler } from './components/viewport-pick/ViewportPickHandler';
+import { AdminHeaderLink } from './components/admin/AdminHeaderLink';
+import './components/admin/AdminPage.css';
 import { InputChannel } from './services/inputChannel';
 import { runAuthGate } from './services/authGate';
 import type { User } from './services/whoami';
@@ -224,6 +226,12 @@ export default class StreamOnly extends React.Component<AppProps, StreamOnlyStat
                     margin: 0
                 }}
             >
+                {/* Admin link — visible only for role=admin, links to
+                  * /admin (full-page nav). Positioned via the
+                  * .admin-header-link rules in AdminPage.css so it
+                  * tucks into the top-right above the stream. */}
+                <AdminHeaderLink user={this.state.auth.user} />
+
                 <div id="streamonly-wrapper" ref={this._streamWrapperRef}>
                     <AppStream
                         sessionId={this.props.sessionId}

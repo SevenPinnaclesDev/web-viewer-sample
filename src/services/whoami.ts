@@ -23,6 +23,11 @@ export interface User {
     email: string;
     role: "admin" | "user";
     display_name: string;
+    /** Server-side user id (UUID). Surfaced for the admin UI which
+     * needs to identify the self-row to hide the Remove button. The
+     * server has always returned this; the SPA parser was just
+     * dropping it. */
+    user_id: string;
 }
 
 export class UnauthenticatedError extends Error {
@@ -112,8 +117,9 @@ export async function getWhoAmI(opts: GetWhoAmIOptions = {}): Promise<User> {
     const email = typeof r.email === "string" ? r.email : null;
     const display_name = typeof r.display_name === "string" ? r.display_name : "";
     const roleRaw = typeof r.role === "string" ? r.role : null;
+    const user_id = typeof r.user_id === "string" ? r.user_id : "";
     if (!email || (roleRaw !== "admin" && roleRaw !== "user")) {
         throw new WhoAmIError(resp.status, "GET /auth/whoami: missing or invalid email/role");
     }
-    return { email, role: roleRaw, display_name };
+    return { email, role: roleRaw, display_name, user_id };
 }
