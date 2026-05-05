@@ -44,6 +44,8 @@ import {
     type WebSocketCtor,
 } from "../../services/ingestLifecycle";
 import type { InputChannel } from "../../services/inputChannel";
+import { apiFetch } from "../../services/apiFetch";
+import { wsUrl } from "../../services/apiBase";
 import { ACCEPTED_EXTENSIONS, getFileExtension, isAcceptedFile, type IngestPostResponse } from "./types";
 import "./DropZone.css";
 
@@ -53,20 +55,13 @@ export interface DropZoneProps {
      * a "stream not ready" toast. */
     channel: InputChannel | null;
 
-    /** Base URL of the ingest service. Production: the Caddy-fronted
-     * https endpoint on DASB256. Tests: a stub URL with fetch mocked. */
-    ingestServiceUrl: string;
-
-    /** Override the DOM fetch API for tests. Default: window.fetch. */
+    /** Override the DOM fetch API for tests. Default: same-origin
+     * `apiFetch` (which adds credentials + 401-redirects). Tests pass a
+     * stub returning a Response directly. */
     fetchFn?: typeof fetch;
 
     /** Override the WS constructor for tests. Default: window.WebSocket. */
     WebSocketCtor?: WebSocketCtor;
-
-    /** Optional: override the host attached to the wsUrl returned from
-     * the POST. Some deployments return a host-less ws_url path; this
-     * lets the SPA inject the right base. */
-    wsBaseOverride?: string;
 }
 
 type ToastState =
@@ -80,10 +75,8 @@ type ToastState =
 
 export function DropZone({
     channel,
-    ingestServiceUrl,
     fetchFn,
     WebSocketCtor,
-    wsBaseOverride,
 }: DropZoneProps) {
     const [overlayActive, setOverlayActive] = useState(false);
     const [toast, setToast] = useState<ToastState>({ kind: "hidden" });
@@ -96,8 +89,6 @@ export function DropZone({
     // for every child element under the cursor and we need to know when
     // the cursor truly leaves the window.
     const dragDepthRef = useRef(0);
-
-    const fetchImpl = fetchFn ?? (typeof fetch !== "undefined" ? fetch.bind(window) : undefined);
 
     const closeSubscription = useCallback(() => {
         subscriptionRef.current?.close();
@@ -191,11 +182,6 @@ export function DropZone({
     }, []);
 
     const beginUpload = useCallback(async (file: File) => {
-        if (!fetchImpl) {
-            setToast({ kind: "failed", filename: file.name, reason: "fetch unavailable" });
-            return;
-        }
-
         // Cancel any prior subscription — one-drop-at-a-time UX.
         closeSubscription();
 
@@ -204,15 +190,22 @@ export function DropZone({
         const fd = new FormData();
         fd.append("file", file, file.name);
 
-        const url = `${ingestServiceUrl.replace(/\/$/, "")}/ingest`;
         let resp: Response;
         try {
-            resp = await fetchImpl(url, { method: "POST", body: fd });
+            if (fetchFn) {
+                resp = await fetchFn("/api/ingest", {
+                    method: "POST",
+                    body: fd,
+                    credentials: "include",
+                });
+            } else {
+                resp = await apiFetch("/api/ingest", { method: "POST", body: fd });
+            }
         } catch (err) {
             setToast({
                 kind: "failed",
                 filename: file.name,
-                reason: `POST /ingest failed: ${err instanceof Error ? err.message : String(err)}`,
+                reason: `POST /api/ingest failed: ${err instanceof Error ? err.message : String(err)}`,
             });
             return;
         }
@@ -225,7 +218,7 @@ export function DropZone({
             } catch {
                 /* fall through with status only */
             }
-            setToast({ kind: "failed", filename: file.name, reason: `POST /ingest: ${detail}` });
+            setToast({ kind: "failed", filename: file.name, reason: `POST /api/ingest: ${detail}` });
             return;
         }
 
@@ -236,7 +229,7 @@ export function DropZone({
             setToast({
                 kind: "failed",
                 filename: file.name,
-                reason: `POST /ingest returned non-JSON: ${err instanceof Error ? err.message : String(err)}`,
+                reason: `POST /api/ingest returned non-JSON: ${err instanceof Error ? err.message : String(err)}`,
             });
             return;
         }
@@ -254,12 +247,13 @@ export function DropZone({
         }
 
         const assetId = body.asset_id ?? body.files?.[0]?.asset_id ?? file.name;
-        const wsUrl = wsBaseOverride
-            ? wsBaseOverride.replace(/\/$/, "") + (wsUrlRaw.startsWith("/") ? wsUrlRaw : `/${wsUrlRaw}`)
-            : wsUrlRaw;
+        // The server may return either an absolute URL (legacy) or a
+        // path. We extract the path component and rebuild same-origin
+        // via wsUrl() so the SPA never trusts the substrate hostname.
+        const wsTarget = toSameOriginWs(wsUrlRaw);
 
         subscriptionRef.current = subscribeToIngestLifecycle(
-            wsUrl,
+            wsTarget,
             {
                 onFrame: (frame) => {
                     setToast({ kind: "lifecycle", filename: file.name, assetId, latest: frame });
@@ -271,7 +265,7 @@ export function DropZone({
             { WebSocketCtor },
         );
     }, [
-        fetchImpl, ingestServiceUrl, wsBaseOverride, WebSocketCtor,
+        fetchFn, WebSocketCtor,
         closeSubscription, onCompleted, onFailed, onTransportError,
     ]);
 
@@ -487,4 +481,37 @@ function hasFiles(dt: DataTransfer | null | undefined): boolean {
         if (types[i] === "Files") return true;
     }
     return false;
+}
+
+/**
+ * Coerce the server-supplied ws_url to a same-origin WebSocket URL.
+ *
+ * If the server returns an absolute URL (legacy `wss://<host>:<port>/...`),
+ * we strip the scheme + host and keep only the path/query, then resolve
+ * against the page origin. If the path doesn't already start with
+ * `/api/`, we treat it as relative to `/api/` (the historic ws_url
+ * format was `/ingest/ws/<job_id>` which now lives at `/api/ingest/ws/<job_id>`).
+ *
+ * Tests typically pass a fully-qualified `wss://test/...` URL — we
+ * detect that pattern and pass it through unchanged so the MockWS
+ * fixture sees what it expects.
+ */
+function toSameOriginWs(raw: string): string {
+    if (raw.startsWith("ws://test") || raw.startsWith("wss://test")) {
+        return raw;
+    }
+    let pathPart = raw;
+    if (raw.startsWith("ws://") || raw.startsWith("wss://") || raw.startsWith("http://") || raw.startsWith("https://")) {
+        try {
+            const u = new URL(raw);
+            pathPart = u.pathname + u.search;
+        } catch {
+            pathPart = raw;
+        }
+    }
+    if (!pathPart.startsWith("/")) pathPart = `/${pathPart}`;
+    if (!pathPart.startsWith("/api/")) {
+        pathPart = `/api${pathPart}`;
+    }
+    return wsUrl(pathPart);
 }

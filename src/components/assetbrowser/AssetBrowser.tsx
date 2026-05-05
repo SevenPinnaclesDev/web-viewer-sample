@@ -55,18 +55,15 @@ export interface AssetBrowserProps {
      * "stream not ready" toast instead of blowing up. */
     channel: InputChannel | null;
 
-    /** Base URL of the ingest service. Production: the Caddy-fronted
-     * https endpoint on DASB256 (also used by DropZone). */
-    ingestServiceUrl: string;
-
-    /** Override fetch for tests. Default: window.fetch. */
+    /** Override fetch for tests. Default: same-origin `apiFetch` which
+     * adds credentials + 401-redirects. */
     fetchFn?: FetchFn;
 
     /** Default to false (panel collapsed by default). The user opens
      * it deliberately. Tests can pass true to render expanded. */
     initiallyExpanded?: boolean;
 
-    /** Server-side limit on /assets. Default: 100 (Diana's server default). */
+    /** Server-side limit on /api/assets. Default: 100 (Diana's server default). */
     limit?: number;
 }
 
@@ -85,7 +82,6 @@ type ToastState =
 
 export function AssetBrowser({
     channel,
-    ingestServiceUrl,
     fetchFn,
     initiallyExpanded = false,
     limit = 100,
@@ -109,7 +105,7 @@ export function AssetBrowser({
 
         setLoadState({ kind: "loading" });
         try {
-            const assets = await listAssets(ingestServiceUrl, {
+            const assets = await listAssets({
                 fetchFn,
                 limit,
                 signal: controller.signal,
@@ -127,10 +123,8 @@ export function AssetBrowser({
                 : (err instanceof Error ? err.message : String(err));
             setLoadState({ kind: "error", message });
         }
-    }, [ingestServiceUrl, fetchFn, limit]);
+    }, [fetchFn, limit]);
 
-    // Mount-time fetch. Also re-fetches when ingestServiceUrl changes
-    // (rare; the URL is derived from StreamConfig and is stable).
     useEffect(() => {
         void refresh();
         return () => {

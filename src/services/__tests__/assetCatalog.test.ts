@@ -1,13 +1,16 @@
 /*
- * assetCatalog service tests — exercise GET /assets via a stub fetch,
+ * assetCatalog service tests — exercise GET /api/assets via a stub fetch,
  * cover happy path + malformed payloads + non-2xx + transport error.
+ *
+ * Same-origin refactor 2026-05-04: the API path is `/api/assets`; the
+ * SPA never names a deployment hostname.
  *
  * Ryan Takeda — Asset Browser sprint, 2026-05-02.
  */
 import { describe, it, expect, vi } from "vitest";
 import {
     listAssets,
-    buildAssetListUrl,
+    buildAssetListPath,
     AssetCatalogError,
     type AssetSummary,
 } from "../assetCatalog";
@@ -30,7 +33,7 @@ function sampleAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
         asset_id: "compass_step",
         slug: "compass_step",
         current_version: 3,
-        omniverse_url: "omniverse://nucleus.dasb256/DATE/assets/compass_step/v3/scene.usd",
+        omniverse_url: "omniverse://nucleus/DATE/assets/compass_step/v3/scene.usd",
         source_format: "step",
         ingest_at: "2026-05-02T19:00:00+00:00",
         thumbnail_url: null,
@@ -39,42 +42,34 @@ function sampleAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
 }
 
 
-// ---- buildAssetListUrl ---------------------------------------------------
+// ---- buildAssetListPath --------------------------------------------------
 
-describe("buildAssetListUrl", () => {
-    it("returns base /assets with no params when opts empty", () => {
-        expect(buildAssetListUrl("https://ingest.test")).toBe("https://ingest.test/assets");
-    });
-
-    it("strips trailing slash from base", () => {
-        expect(buildAssetListUrl("https://ingest.test/")).toBe("https://ingest.test/assets");
+describe("buildAssetListPath", () => {
+    it("returns /api/assets with no params when opts empty", () => {
+        expect(buildAssetListPath()).toBe("/api/assets");
     });
 
     it("appends limit query param", () => {
-        expect(buildAssetListUrl("https://ingest.test", { limit: 50 }))
-            .toBe("https://ingest.test/assets?limit=50");
+        expect(buildAssetListPath({ limit: 50 })).toBe("/api/assets?limit=50");
     });
 
     it("appends prefix query param", () => {
-        expect(buildAssetListUrl("https://ingest.test", { prefix: "comp" }))
-            .toBe("https://ingest.test/assets?prefix=comp");
+        expect(buildAssetListPath({ prefix: "comp" })).toBe("/api/assets?prefix=comp");
     });
 
     it("appends both limit + prefix when both provided", () => {
-        const url = buildAssetListUrl("https://ingest.test", { limit: 10, prefix: "comp" });
-        expect(url).toContain("limit=10");
-        expect(url).toContain("prefix=comp");
-        expect(url.startsWith("https://ingest.test/assets?")).toBe(true);
+        const p = buildAssetListPath({ limit: 10, prefix: "comp" });
+        expect(p).toContain("limit=10");
+        expect(p).toContain("prefix=comp");
+        expect(p.startsWith("/api/assets?")).toBe(true);
     });
 
     it("omits empty prefix from query string", () => {
-        expect(buildAssetListUrl("https://ingest.test", { prefix: "" }))
-            .toBe("https://ingest.test/assets");
+        expect(buildAssetListPath({ prefix: "" })).toBe("/api/assets");
     });
 
     it("omits non-positive limit from query string", () => {
-        expect(buildAssetListUrl("https://ingest.test", { limit: 0 }))
-            .toBe("https://ingest.test/assets");
+        expect(buildAssetListPath({ limit: 0 })).toBe("/api/assets");
     });
 });
 
@@ -87,20 +82,22 @@ describe("listAssets", () => {
             sampleAsset({ slug: "compass_step" }),
             sampleAsset({ slug: "engine_block_step", current_version: 1 }),
         ]));
-        const out = await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+        const out = await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         expect(out).toHaveLength(2);
         expect(out[0].slug).toBe("compass_step");
         expect(out[1].slug).toBe("engine_block_step");
         expect(out[1].current_version).toBe(1);
         expect(fetchSpy).toHaveBeenCalledWith(
-            "https://ingest.test/assets",
+            "/api/assets",
             expect.objectContaining({ method: "GET" }),
         );
+        const init = fetchSpy.mock.calls[0][1] as RequestInit;
+        expect(init.credentials).toBe("include");
     });
 
     it("forwards limit + prefix query params to fetch", async () => {
         const fetchSpy = vi.fn().mockResolvedValue(makeResponse([]));
-        await listAssets("https://ingest.test", {
+        await listAssets({
             fetchFn: fetchSpy as unknown as typeof fetch,
             limit: 25,
             prefix: "comp",
@@ -112,7 +109,7 @@ describe("listAssets", () => {
 
     it("returns [] for an empty 200 OK array (empty-catalog state)", async () => {
         const fetchSpy = vi.fn().mockResolvedValue(makeResponse([]));
-        const out = await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+        const out = await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         expect(out).toEqual([]);
     });
 
@@ -123,7 +120,7 @@ describe("listAssets", () => {
             { asset_id: "no_url", slug: "no_url" },                            // no omniverse_url → drop
             sampleAsset({ slug: "also_ok" }),
         ]));
-        const out = await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+        const out = await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         expect(out.map((a) => a.slug)).toEqual(["ok", "also_ok"]);
     });
 
@@ -132,17 +129,17 @@ describe("listAssets", () => {
             { slug: "a", omniverse_url: "omniverse://x", current_version: "5" },
             { slug: "b", omniverse_url: "omniverse://y" /* no version */ },
         ]));
-        const out = await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+        const out = await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         expect(out[0].current_version).toBe(5);
         expect(out[1].current_version).toBe(1);
     });
 
     it("throws AssetCatalogError with HTTP status on non-2xx", async () => {
         const fetchSpy = vi.fn().mockResolvedValue(makeResponse({ detail: "boom" }, 503));
-        await expect(listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch }))
+        await expect(listAssets({ fetchFn: fetchSpy as unknown as typeof fetch }))
             .rejects.toThrow(AssetCatalogError);
         try {
-            await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+            await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         } catch (err) {
             expect(err).toBeInstanceOf(AssetCatalogError);
             expect((err as AssetCatalogError).status).toBe(503);
@@ -151,10 +148,10 @@ describe("listAssets", () => {
 
     it("throws AssetCatalogError with status=-1 on transport failure", async () => {
         const fetchSpy = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
-        await expect(listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch }))
+        await expect(listAssets({ fetchFn: fetchSpy as unknown as typeof fetch }))
             .rejects.toThrow(AssetCatalogError);
         try {
-            await listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch });
+            await listAssets({ fetchFn: fetchSpy as unknown as typeof fetch });
         } catch (err) {
             expect((err as AssetCatalogError).status).toBe(-1);
             expect((err as AssetCatalogError).message).toContain("Failed to fetch");
@@ -163,7 +160,7 @@ describe("listAssets", () => {
 
     it("throws AssetCatalogError when response body is not an array", async () => {
         const fetchSpy = vi.fn().mockResolvedValue(makeResponse({ detail: "not array" }, 200));
-        await expect(listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch }))
+        await expect(listAssets({ fetchFn: fetchSpy as unknown as typeof fetch }))
             .rejects.toThrow(/expected array/);
     });
 
@@ -171,7 +168,7 @@ describe("listAssets", () => {
         const abortErr = new Error("aborted");
         abortErr.name = "AbortError";
         const fetchSpy = vi.fn().mockRejectedValue(abortErr);
-        await expect(listAssets("https://ingest.test", { fetchFn: fetchSpy as unknown as typeof fetch }))
+        await expect(listAssets({ fetchFn: fetchSpy as unknown as typeof fetch }))
             .rejects.toBe(abortErr);
     });
 });

@@ -5,13 +5,16 @@
  * Coverage:
  *   - Overlay activates on dragenter with files
  *   - Overlay hides on dragleave
- *   - Drop with accepted extension POSTs to /ingest, opens WS, displays
- *     lifecycle frames, fires asset.open on completed
+ *   - Drop with accepted extension POSTs to same-origin /api/ingest,
+ *     opens WS, displays lifecycle frames, fires asset.open on completed
  *   - Drop with rejected extension shows the rejected toast and does NOT
  *     POST to ingest
- *   - POST /ingest non-2xx shows failed toast
+ *   - POST /api/ingest non-2xx shows failed toast
  *   - WS failed frame shows failed toast
  *   - kit channel rejection (after completed) shows failed toast
+ *
+ * Same-origin refactor 2026-05-04: paths are `/api/ingest` and
+ * `wss://<origin>/api/ingest/ws/...`.
  *
  * Ryan Takeda — Phase 1 close-the-loop, 2026-05-01.
  */
@@ -127,7 +130,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={vi.fn() as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -142,7 +144,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={vi.fn() as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -160,7 +161,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -177,7 +177,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -188,23 +187,22 @@ describe("DropZone", () => {
         expect(fetchSpy).not.toHaveBeenCalled();
     });
 
-    it("POSTs accepted file to /ingest, shows lifecycle frames, fires asset.open on completed", async () => {
+    it("POSTs accepted file to /api/ingest, shows lifecycle frames, fires asset.open on completed", async () => {
         const channel = makeMockChannel();
         const fetchSpy = vi.fn().mockResolvedValue(makePostResponse({
             asset_id: "compass_step",
-            ws_url: "wss://ingest.test/ingest/ws/job-1",
+            ws_url: "wss://test/api/ingest/ws/job-1",
             expected_pipeline: "passthrough",
             files: [{
                 file_index: 0, original_filename: "compass.usdz",
                 bytes_written: 100, source_class: "usdz", pipeline: "passthrough",
                 job_id: "job-1", asset_id: "compass_step",
-                ws_url: "wss://ingest.test/ingest/ws/job-1",
+                ws_url: "wss://test/api/ingest/ws/job-1",
             }],
         }));
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -214,14 +212,15 @@ describe("DropZone", () => {
 
         // POST kicks off async; uploading toast shows before response resolves
         await waitFor(() => expect(fetchSpy).toHaveBeenCalledWith(
-            "https://ingest.test/ingest",
+            "/api/ingest",
             expect.objectContaining({ method: "POST" }),
         ));
 
-        // After resolve, WS opens
+        // After resolve, WS opens against the path the server returned
+        // (test fixture preserves the wss://test/... pass-through)
         await waitFor(() => expect(MockWS.instances.length).toBe(1));
         const ws = MockWS.instances[0];
-        expect(ws.url).toBe("wss://ingest.test/ingest/ws/job-1");
+        expect(ws.url).toBe("wss://test/api/ingest/ws/job-1");
 
         // Push a lifecycle frame — UI updates
         await act(async () => {
@@ -258,7 +257,7 @@ describe("DropZone", () => {
         expect(screen.getByTestId("dropzone-toast-loaded")).toHaveTextContent(/compass_step/);
     });
 
-    it("shows failed toast when POST /ingest returns non-2xx", async () => {
+    it("shows failed toast when POST /api/ingest returns non-2xx", async () => {
         const channel = makeMockChannel();
         const fetchSpy = vi.fn().mockResolvedValue(makePostResponse(
             { detail: "unsupported format" }, 415,
@@ -266,7 +265,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -279,12 +277,11 @@ describe("DropZone", () => {
     it("shows failed toast on lifecycle failed frame", async () => {
         const channel = makeMockChannel();
         const fetchSpy = vi.fn().mockResolvedValue(makePostResponse({
-            asset_id: "x", ws_url: "wss://test/ws/job-1",
+            asset_id: "x", ws_url: "wss://test/api/ingest/ws/job-1",
         }));
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -314,12 +311,11 @@ describe("DropZone", () => {
             openAsset: vi.fn().mockRejectedValue(new Error("nucleus_unreachable: timeout")),
         });
         const fetchSpy = vi.fn().mockResolvedValue(makePostResponse({
-            asset_id: "x", ws_url: "wss://test/ws/job-1",
+            asset_id: "x", ws_url: "wss://test/api/ingest/ws/job-1",
         }));
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -353,7 +349,6 @@ describe("DropZone", () => {
         render(
             <DropZone
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,
@@ -367,12 +362,11 @@ describe("DropZone", () => {
 
     it("with channel=null, completed frame still shows loaded toast (asset is in Nucleus)", async () => {
         const fetchSpy = vi.fn().mockResolvedValue(makePostResponse({
-            asset_id: "x", ws_url: "wss://test/ws/job-1",
+            asset_id: "x", ws_url: "wss://test/api/ingest/ws/job-1",
         }));
         render(
             <DropZone
                 channel={null}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 WebSocketCtor={MockWS as unknown as WebSocketCtor}
             />,

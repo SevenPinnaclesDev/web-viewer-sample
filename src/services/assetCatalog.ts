@@ -1,16 +1,20 @@
 /*
  * assetCatalog.ts — SPA-side fetch wrapper for the DATE ingest service's
- * `GET /assets` endpoint.
+ * `GET /api/assets` endpoint (Caddy-routed, same-origin).
  *
  * Mirrors the structure of `ingestLifecycle.ts`: thin testable layer with
  * an injectable transport (fetch), explicit types matching Diana's
  * server-side contract, no UI concerns.
  *
- * Endpoint contract — coordinated with Diana 2026-05-02:
+ * Endpoint contract — coordinated with Diana 2026-05-02; same-origin
+ * refactor 2026-05-04:
  *
- *     GET <ingestServiceUrl>/assets[?limit=100&prefix=foo]
+ *     GET /api/assets[?limit=100&prefix=foo]
  *     200 → AssetSummary[]   (sorted desc by ingest_at)
  *     5xx → JSON { detail: string }
+ *
+ * The path is same-origin — Caddy reverse-proxies `/api/*` to the ingest
+ * service. The SPA never names a deployment hostname.
  *
  * Each AssetSummary describes one asset *currently published on Nucleus*,
  * meaning its ingest worker reached the `completed` state. The ingest
@@ -23,8 +27,10 @@
  * the daemon uses, so we re-use the kit-side `resolve_asset_url`
  * verbatim-honors-URL behavior.
  *
- * Ryan Takeda — Asset Browser sprint, 2026-05-02.
+ * Ryan Takeda — Asset Browser sprint, 2026-05-02; same-origin 2026-05-04.
  */
+import { apiFetch } from "./apiFetch";
+import { UnauthenticatedError } from "./whoami";
 
 // ---- Wire shape — must match server/ingest/service models ---------------
 
@@ -60,7 +66,9 @@ export type AssetListResponse = AssetSummary[];
 
 // ---- Options + error types ----------------------------------------------
 
-/** Optional injection seam for tests. The default is `window.fetch`. */
+/** Optional injection seam for tests. The default is `apiFetch`-backed
+ * (which calls `window.fetch` with same-origin path + credentials and
+ * 401-redirects). Tests inject a stub returning a Response directly. */
 export type FetchFn = typeof fetch;
 
 export interface ListAssetsOptions {
@@ -93,14 +101,13 @@ export class AssetCatalogError extends Error {
 // ---- Implementation -----------------------------------------------------
 
 /**
- * Build the GET /assets URL with optional query params. Exported for
- * tests — the panel never builds URLs directly, it calls listAssets().
+ * Build the GET /api/assets path with optional query params. Exported
+ * for tests — the panel never builds paths directly, it calls
+ * listAssets().
  */
-export function buildAssetListUrl(
-    ingestServiceUrl: string,
+export function buildAssetListPath(
     opts: { limit?: number; prefix?: string } = {},
 ): string {
-    const base = ingestServiceUrl.replace(/\/$/, "");
     const params = new URLSearchParams();
     if (opts.limit !== undefined && opts.limit > 0) {
         params.set("limit", String(opts.limit));
@@ -109,15 +116,17 @@ export function buildAssetListUrl(
         params.set("prefix", opts.prefix);
     }
     const qs = params.toString();
-    return qs ? `${base}/assets?${qs}` : `${base}/assets`;
+    return qs ? `/api/assets?${qs}` : `/api/assets`;
 }
 
 /**
- * Fetch the asset catalog from the ingest service.
+ * Fetch the asset catalog from the ingest service via same-origin
+ * `/api/assets`.
  *
  * Returns the parsed array on success. Throws AssetCatalogError on any
  * non-2xx / transport / parse failure — the caller (AssetBrowser) shows
- * an error state and offers a retry.
+ * an error state and offers a retry. UnauthenticatedError propagates
+ * unchanged so the apiFetch redirect path runs.
  *
  * The function defensively coerces the response: it expects an array of
  * AssetSummary-shaped objects, but a non-array body (e.g. `{detail: "x"}`
@@ -126,31 +135,39 @@ export function buildAssetListUrl(
  * yet) — that's the empty-state UX trigger.
  */
 export async function listAssets(
-    ingestServiceUrl: string,
     opts: ListAssetsOptions = {},
 ): Promise<AssetSummary[]> {
-    const fetchImpl = opts.fetchFn ?? (typeof fetch !== "undefined" ? fetch.bind(globalThis) : undefined);
-    if (!fetchImpl) {
-        throw new AssetCatalogError(-1, "fetch unavailable in this environment");
-    }
-
-    const url = buildAssetListUrl(ingestServiceUrl, opts);
+    const path = buildAssetListPath(opts);
 
     let resp: Response;
     try {
-        resp = await fetchImpl(url, {
-            method: "GET",
-            headers: { Accept: "application/json" },
-            signal: opts.signal,
-        });
+        if (opts.fetchFn) {
+            resp = await opts.fetchFn(path, {
+                method: "GET",
+                headers: { Accept: "application/json" },
+                credentials: "include",
+                signal: opts.signal,
+            });
+            if (resp.status === 401) {
+                throw new UnauthenticatedError();
+            }
+        } else {
+            resp = await apiFetch(path, {
+                method: "GET",
+                headers: { Accept: "application/json" },
+                signal: opts.signal,
+            });
+        }
     } catch (err) {
+        if (err instanceof UnauthenticatedError) {
+            throw err;
+        }
         if (err instanceof Error && err.name === "AbortError") {
-            // Re-throw aborts unchanged so callers can distinguish.
             throw err;
         }
         throw new AssetCatalogError(
             -1,
-            `GET /assets failed: ${err instanceof Error ? err.message : String(err)}`,
+            `GET /api/assets failed: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
 
@@ -162,7 +179,7 @@ export async function listAssets(
         } catch {
             /* fall through with status only */
         }
-        throw new AssetCatalogError(resp.status, `GET /assets: ${detail}`);
+        throw new AssetCatalogError(resp.status, `GET /api/assets: ${detail}`);
     }
 
     let parsed: unknown;
@@ -171,14 +188,14 @@ export async function listAssets(
     } catch (err) {
         throw new AssetCatalogError(
             resp.status,
-            `GET /assets returned non-JSON: ${err instanceof Error ? err.message : String(err)}`,
+            `GET /api/assets returned non-JSON: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
 
     if (!Array.isArray(parsed)) {
         throw new AssetCatalogError(
             resp.status,
-            `GET /assets expected array, got ${typeof parsed}`,
+            `GET /api/assets expected array, got ${typeof parsed}`,
         );
     }
 

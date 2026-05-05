@@ -5,11 +5,11 @@
  * Mirrors the structure of inputChannel.ts (one service per channel,
  * testable in isolation against an injected transport, typed callbacks).
  *
- * The ingest service runs at :49101 on DASB256. Per
- * `architecture/ingest-service.md` §3, POST /ingest returns
- * `{asset_id, ws_url, ...}`; the SPA opens a WS to `ws_url` (which is
- * `wss://<host>:49101/ingest/ws/{job_id}` in production) and receives
- * server-pushed JSON frames following the lifecycle state machine:
+ * The ingest service is reached same-origin via Caddy at
+ * `/api/ingest/ws/{job_id}`. Per `architecture/ingest-service.md` §3,
+ * POST /api/ingest returns `{asset_id, ws_url, ...}`; the SPA opens a
+ * WS at the same-origin path and receives server-pushed JSON frames
+ * following the lifecycle state machine:
  *
  *     received → routed → queued → processing → normalize.<fix-name> → completed | failed
  *
@@ -140,6 +140,12 @@ export interface IngestLifecycleOptions {
  * (e.g. on component unmount). The handlers fire as frames arrive;
  * onCompleted / onFailed are convenience terminals that auto-close the
  * socket after firing.
+ *
+ * The `wsUrl` argument may be a fully-qualified absolute URL (test
+ * fixtures, or an unconverted server response) or a same-origin path
+ * — same-origin paths get resolved through `wsUrl()` against the
+ * current origin so the substrate's hostname is never named in the
+ * SPA. Tests pass `wss://test/...` and that flows through unchanged.
  *
  * Defensive parsing: any frame that doesn't match the schema is logged
  * and dropped. We don't surface parse errors to callers — the lifecycle

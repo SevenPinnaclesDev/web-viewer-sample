@@ -72,7 +72,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
             />,
         );
@@ -85,7 +84,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
             />,
         );
@@ -101,7 +99,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -118,7 +115,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -134,7 +130,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -156,7 +151,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -179,7 +173,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={channel}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -195,7 +188,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={null}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -214,7 +206,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -238,7 +229,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -260,7 +250,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -276,7 +265,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -292,7 +280,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={null}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
@@ -309,7 +296,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
                 limit={25}
@@ -328,7 +314,6 @@ describe("AssetBrowser", () => {
         render(
             <AssetBrowser
                 channel={makeMockChannel()}
-                ingestServiceUrl="https://ingest.test"
                 fetchFn={fetchSpy as unknown as typeof fetch}
                 initiallyExpanded
             />,
