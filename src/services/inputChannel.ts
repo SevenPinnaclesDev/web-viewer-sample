@@ -25,6 +25,8 @@
 import type {
     ChannelRequest,
     ChannelEvent,
+    HidePrimsResult,
+    IsolatePrimsResult,
     LibraryCatalog,
     OpenAssetRequest,
     OpenAssetResult,
@@ -32,6 +34,8 @@ import type {
     PickSlotResult,
     QuerySlotsResult,
     SetOverridesBulkResult,
+    ShowAllResult,
+    ShowPrimsResult,
 } from "./inputChannelTypes";
 
 export type SendFn = (jsonText: string) => void;
@@ -333,5 +337,48 @@ export class InputChannel {
         const payload: PickSlotRequest = { x_norm: xNorm, y_norm: yNorm };
         if (viewportId !== undefined) payload.viewport_id = viewportId;
         return this.request<PickSlotResult>("selection.pick_slot", payload);
+    }
+
+    /**
+     * Hide / Isolate / Show-All — visibility primitives (2026-05-02).
+     *
+     * The kit writes UsdGeomImageable.visibility on the named prims. All
+     * four commands are reversible without a stage round-trip; v1 keeps
+     * the visibility writes session-scoped (no persistence layer). The
+     * SPA tracks the hidden set client-side so it can show "N things
+     * hidden" indicators and reset on asset switch.
+     *
+     * Payload shape per the contract:
+     *  - hide / show / isolate: `{ prim_paths: ["/World/Roof/Panel", ...] }`
+     *  - show_all: `{}` (no payload required)
+     *
+     * Errors per the kit-side handlers:
+     *  - `invalid_payload` — bad shape
+     *  - `no_active_stage` — kit has no live stage
+     *  - `prim_not_found` — any path doesn't resolve to a prim on the stage
+     *    (commands are all-or-nothing — if any path is bad, the whole
+     *    request rejects so the SPA's hidden-set stays in sync)
+     *  - `kit_internal` — anything else
+     */
+    hidePrims(primPaths: string[]): Promise<HidePrimsResult> {
+        return this.request<HidePrimsResult>("selection.hide_prims", {
+            prim_paths: primPaths,
+        });
+    }
+
+    showPrims(primPaths: string[]): Promise<ShowPrimsResult> {
+        return this.request<ShowPrimsResult>("selection.show_prims", {
+            prim_paths: primPaths,
+        });
+    }
+
+    isolatePrims(primPaths: string[]): Promise<IsolatePrimsResult> {
+        return this.request<IsolatePrimsResult>("selection.isolate_prims", {
+            prim_paths: primPaths,
+        });
+    }
+
+    showAll(): Promise<ShowAllResult> {
+        return this.request<ShowAllResult>("selection.show_all", {});
     }
 }

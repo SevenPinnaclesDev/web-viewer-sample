@@ -129,3 +129,115 @@
 .viewport-pick-toast-dismiss:hover {
     color: #ffffff;
 }
+
+/*
+ * Show All button — sibling of the pick toggle in the toolbar. Restores
+ * visibility on every hidden / isolated prim. Same visual language as the
+ * pick toggle so the toolbar stays cohesive.
+ */
+.viewport-pick-show-all {
+    background: rgba(20, 20, 24, 0.85);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background-color 120ms, border-color 120ms;
+}
+
+.viewport-pick-show-all:hover:not(:disabled) {
+    background: rgba(40, 40, 48, 0.9);
+}
+
+.viewport-pick-show-all:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/*
+ * Action menu — anchored to the click point. Sits above the streaming
+ * viewport and the picker overlay; below the modal picker (z-index 1000+)
+ * so opening the picker dismisses the menu visually.
+ *
+ * Backdrop is full-screen, transparent, captures outside-click.
+ */
+.viewport-pick-action-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    background: transparent;
+    cursor: default;
+}
+
+.viewport-pick-action-menu {
+    position: fixed;
+    z-index: 71;
+    width: 168px;
+    background: rgba(20, 20, 24, 0.95);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+}
+
+.viewport-pick-action-header {
+    padding: 6px 8px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 4px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.viewport-pick-action-header code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-transform: none;
+}
+
+.viewport-pick-action-button {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid transparent;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 80ms, border-color 80ms;
+}
+
+.viewport-pick-action-button:hover:not(:disabled):not(.viewport-pick-action-disabled) {
+    background: rgba(56, 134, 255, 0.18);
+    border-color: rgba(56, 134, 255, 0.4);
+}
+
+.viewport-pick-action-button:disabled,
+.viewport-pick-action-button.viewport-pick-action-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}

@@ -84,6 +84,23 @@ type PickerTarget = {
     slot: PickSlotResult;
 };
 
+/** Floating action menu state. Appears anchored near the click point on
+ * a successful pick. The operator chooses Hide / Isolate / Pick Material /
+ * Focus from there.
+ *
+ * Anchor decision (2026-05-02 follow-up): we anchor to the click point
+ * because Jim's customer-zero target is a CAD-style inspection workflow
+ * ("I tap a wall, action menu pops up right there"). Fixed-corner would
+ * disconnect the action from the spatial context. We clamp the menu so
+ * it never overflows the viewport — see `clampMenuPosition`.
+ */
+type ActionMenuTarget = {
+    slot: PickSlotResult;
+    /** Page-coords of the original click — used to position the menu. */
+    anchorX: number;
+    anchorY: number;
+};
+
 type Toast =
     | { kind: "hidden" }
     | { kind: "info"; message: string }
@@ -93,6 +110,47 @@ type Toast =
 
 const TOAST_DURATION_MS = 2400;
 const MAX_RECENTLY_USED = 8;
+
+/** Estimated menu dimensions used for clamping. Real measurement happens
+ * via getBoundingClientRect after layout if we ever need pixel-perfect.
+ * The estimate is sufficient because we only need to keep the menu inside
+ * the viewport — being a few px short of an edge is fine.
+ */
+const ACTION_MENU_WIDTH = 168;
+const ACTION_MENU_HEIGHT = 184;
+const ACTION_MENU_OFFSET = 8; // gap between click point and menu edge
+
+/**
+ * Clamp a desired (x, y) position so the action menu fits inside the
+ * viewport. Returns the top-left coords for the menu element.
+ *
+ * Anchoring strategy: place the menu's TOP-LEFT just below-and-right of
+ * the click. If that would overflow the right edge, flip to the LEFT side
+ * of the click. Same for vertical.
+ */
+export function clampMenuPosition(
+    anchorX: number,
+    anchorY: number,
+    viewportWidth: number,
+    viewportHeight: number,
+    menuWidth: number = ACTION_MENU_WIDTH,
+    menuHeight: number = ACTION_MENU_HEIGHT,
+): { left: number; top: number } {
+    let left = anchorX + ACTION_MENU_OFFSET;
+    let top = anchorY + ACTION_MENU_OFFSET;
+    // Flip horizontally if it would overflow the right edge.
+    if (left + menuWidth > viewportWidth) {
+        left = anchorX - menuWidth - ACTION_MENU_OFFSET;
+    }
+    // Flip vertically if it would overflow the bottom edge.
+    if (top + menuHeight > viewportHeight) {
+        top = anchorY - menuHeight - ACTION_MENU_OFFSET;
+    }
+    // Hard-clamp to viewport bounds.
+    left = Math.max(4, Math.min(left, viewportWidth - menuWidth - 4));
+    top = Math.max(4, Math.min(top, viewportHeight - menuHeight - 4));
+    return { left, top };
+}
 
 /**
  * Compute normalized [0..1] viewport coords from a click event + bounding
@@ -120,11 +178,26 @@ export function ViewportPickHandler({
 }: ViewportPickHandlerProps) {
     const [pickModeOn, setPickModeOn] = useState(false);
     const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
+    const [actionMenuTarget, setActionMenuTarget] = useState<ActionMenuTarget | null>(null);
+    /** Set of prim paths that the operator has hidden via the action menu.
+     * Pure session state — resets when assetId changes (fresh asset) or
+     * when Show All is invoked. Persistence to a USD layer is v1.5
+     * (Diana's territory). */
+    const [hiddenPaths, setHiddenPaths] = useState<Set<string>>(new Set());
     const [library, setLibrary] = useState<LibraryState>({ kind: "unfetched" });
     const [recentlyUsed, setRecentlyUsed] = useState<MdlPickerPick[]>([]);
     const [toast, setToast] = useState<Toast>({ kind: "hidden" });
 
     const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Reset hidden-set on asset switch — a fresh asset has no hidden state
+    // (kit re-loads visibility from the freshly-opened stage). Keeping the
+    // old asset's hidden-set around would lie to the user.
+    useEffect(() => {
+        setHiddenPaths(new Set());
+        // Also dismiss any open action menu on asset switch.
+        setActionMenuTarget(null);
+    }, [assetId]);
 
     // ---- toast lifecycle ---------------------------------------------------
 
@@ -163,16 +236,25 @@ export function ViewportPickHandler({
 
     // ---- the pick itself ---------------------------------------------------
 
-    const performPick = useCallback(async (xNorm: number, yNorm: number) => {
+    const performPick = useCallback(async (
+        xNorm: number,
+        yNorm: number,
+        anchorX: number,
+        anchorY: number,
+    ) => {
         if (!channel || !assetId) {
             showToast({ kind: "failed", message: "Stream not ready — cannot pick." });
             return;
         }
         try {
             const slot = await channel.pickSlot(xNorm, yNorm);
-            // Open the picker pre-populated with the picked slot.
-            setPickerTarget({ slot });
-            // Lazy-fetch library on first pick.
+            // Open the floating action menu pre-populated with the picked
+            // slot. The user picks Hide / Isolate / Pick Material / Focus
+            // from there; "Pick Material" is what opens the MdlPicker modal.
+            setActionMenuTarget({ slot, anchorX, anchorY });
+            // Pre-fetch the library so the picker is fast if the user
+            // chooses Pick Material — we hide the latency in the action
+            // menu's brief lifetime.
             if (library.kind === "unfetched") {
                 void fetchLibrary();
             }
@@ -218,7 +300,7 @@ export function ViewportPickHandler({
         const rect = wrapper.getBoundingClientRect();
         const coords = computeNormalizedCoords(evt.clientX, evt.clientY, rect);
         if (coords === null) return;
-        void performPick(coords.xNorm, coords.yNorm);
+        void performPick(coords.xNorm, coords.yNorm, evt.clientX, evt.clientY);
     }, [streamWrapperRef, performPick]);
 
     // ---- click capture (modifier-key path, document-level) -----------------
@@ -254,7 +336,7 @@ export function ViewportPickHandler({
             if (coords === null) return;
             evt.preventDefault();
             evt.stopPropagation();
-            void performPick(coords.xNorm, coords.yNorm);
+            void performPick(coords.xNorm, coords.yNorm, evt.clientX, evt.clientY);
         };
         window.addEventListener("click", handler, true);
         return () => window.removeEventListener("click", handler, true);
@@ -310,6 +392,110 @@ export function ViewportPickHandler({
 
     const closePicker = useCallback(() => setPickerTarget(null), []);
 
+    // ---- action menu handlers (Hide / Isolate / Pick Material / Focus) ----
+
+    /** Dismiss the action menu without acting. Bound to Esc + outside clicks. */
+    const dismissActionMenu = useCallback(() => setActionMenuTarget(null), []);
+
+    /** Hide the prim under the picked target. Adds the path to hiddenPaths
+     * so the indicator updates and the operator can see "12 things hidden."
+     * On error: surface a failed toast; do NOT add to hiddenPaths. */
+    const handleActionHide = useCallback(async () => {
+        if (!channel || !actionMenuTarget) return;
+        const path = actionMenuTarget.slot.prim_path_picked;
+        const targetLabel = actionMenuTarget.slot.display_name || actionMenuTarget.slot.source_name;
+        setActionMenuTarget(null);
+        try {
+            await channel.hidePrims([path]);
+            setHiddenPaths((prev) => {
+                const next = new Set(prev);
+                next.add(path);
+                return next;
+            });
+            showToast({ kind: "info", message: `Hid ${targetLabel}` });
+        } catch (err) {
+            const ce = err instanceof ChannelError
+                ? err
+                : new ChannelError("kit_internal", err instanceof Error ? err.message : String(err));
+            showToast({ kind: "failed", message: `Hide failed: ${ce.code}: ${ce.message}` });
+        }
+    }, [channel, actionMenuTarget, showToast]);
+
+    /** Isolate the prim — kit hides everything else. We track the picked
+     * path in hiddenPaths INVERSELY: nothing here belongs in the hidden
+     * set because the SPA's "hidden things" indicator is meant for "stuff
+     * you hid," not "stuff that's invisible because you isolated something
+     * else." Show All clears all of it back regardless. */
+    const handleActionIsolate = useCallback(async () => {
+        if (!channel || !actionMenuTarget) return;
+        const path = actionMenuTarget.slot.prim_path_picked;
+        const targetLabel = actionMenuTarget.slot.display_name || actionMenuTarget.slot.source_name;
+        setActionMenuTarget(null);
+        try {
+            await channel.isolatePrims([path]);
+            // Mark "isolation active" via a synthetic key so the indicator
+            // shows "isolating <X>". We re-use hiddenPaths since the
+            // streaming-viewport state is "X is the only thing visible";
+            // the indicator below counts hiddenPaths.size which is fine
+            // for either UI. Cleaner still: a separate `isolation` state.
+            // For v1 we keep one indicator: "isolation: <name>" toast +
+            // we leave hiddenPaths empty (isolation isn't a hide-list).
+            showToast({ kind: "info", message: `Isolated ${targetLabel}` });
+        } catch (err) {
+            const ce = err instanceof ChannelError
+                ? err
+                : new ChannelError("kit_internal", err instanceof Error ? err.message : String(err));
+            showToast({ kind: "failed", message: `Isolate failed: ${ce.code}: ${ce.message}` });
+        }
+    }, [channel, actionMenuTarget, showToast]);
+
+    /** "Pick Material" — opens the existing picker modal pre-populated. */
+    const handleActionPickMaterial = useCallback(() => {
+        if (!actionMenuTarget) return;
+        setPickerTarget({ slot: actionMenuTarget.slot });
+        setActionMenuTarget(null);
+    }, [actionMenuTarget]);
+
+    /** "Focus" — placeholder. Wires up when the parallel agent's
+     * view.focus_at_point command lands. Until then the button is
+     * rendered but disabled. */
+    const handleActionFocus = useCallback(() => {
+        // Intentionally inert at v1 — the kit-side view.focus_at_point
+        // command isn't implemented yet (parallel agent's lane). When
+        // landed: call channel.focusAtPoint(prim_path_picked).
+        showToast({
+            kind: "info",
+            message: "Focus comes online with the next view-extension drop.",
+        });
+        setActionMenuTarget(null);
+    }, [showToast]);
+
+    /** Show All — toolbar button. Always available. Resets hiddenPaths. */
+    const handleShowAll = useCallback(async () => {
+        if (!channel) return;
+        try {
+            await channel.showAll();
+            setHiddenPaths(new Set());
+            showToast({ kind: "info", message: "Showing all" });
+        } catch (err) {
+            const ce = err instanceof ChannelError
+                ? err
+                : new ChannelError("kit_internal", err instanceof Error ? err.message : String(err));
+            showToast({ kind: "failed", message: `Show All failed: ${ce.code}: ${ce.message}` });
+        }
+    }, [channel, showToast]);
+
+    // Esc closes the action menu (matches the existing Esc-closes-pick-mode
+    // pattern). Outside-click handled by an invisible backdrop in JSX.
+    useEffect(() => {
+        if (!actionMenuTarget) return;
+        const handler = (evt: KeyboardEvent) => {
+            if (evt.key === "Escape") dismissActionMenu();
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [actionMenuTarget, dismissActionMenu]);
+
     // ---- derived render state ----------------------------------------------
 
     const channelReady = channel !== null && assetId !== null;
@@ -328,7 +514,7 @@ export function ViewportPickHandler({
 
     return (
         <>
-            {/* Toggle button — top-right by default. CSS owns positioning. */}
+            {/* Toolbar — Pick toggle + Show All button. CSS owns positioning. */}
             <div className="viewport-pick-toolbar" data-testid="viewport-pick-toolbar">
                 <button
                     type="button"
@@ -345,6 +531,16 @@ export function ViewportPickHandler({
                 >
                     {pickModeOn ? "Pick: ON" : "Pick"}
                 </button>
+                <button
+                    type="button"
+                    className="viewport-pick-show-all"
+                    data-testid="viewport-pick-show-all"
+                    disabled={!channel}
+                    onClick={handleShowAll}
+                    title="Restore visibility on all hidden / isolated prims"
+                >
+                    Show All{hiddenPaths.size > 0 ? ` (${hiddenPaths.size})` : ""}
+                </button>
             </div>
 
             {/* Click-capture overlay — shown only when pick mode is on. The
@@ -358,6 +554,20 @@ export function ViewportPickHandler({
                     onClick={onOverlayClick}
                     role="button"
                     aria-label="Pick mode — tap a surface to pick its material slot"
+                />
+            )}
+
+            {/* Floating action menu — appears anchored to the click point on
+              * a successful pick. Hide / Isolate / Pick Material / Focus.
+              * Outside click dismisses via the invisible backdrop. */}
+            {actionMenuTarget && (
+                <ActionMenu
+                    target={actionMenuTarget}
+                    onHide={handleActionHide}
+                    onIsolate={handleActionIsolate}
+                    onPickMaterial={handleActionPickMaterial}
+                    onFocus={handleActionFocus}
+                    onDismiss={dismissActionMenu}
                 />
             )}
 
@@ -377,6 +587,99 @@ export function ViewportPickHandler({
             {toast.kind !== "hidden" && (
                 <ViewportPickToast toast={toast} onDismiss={() => setToast({ kind: "hidden" })} />
             )}
+        </>
+    );
+}
+
+// ---- ActionMenu subcomponent ----------------------------------------------
+
+/**
+ * Floating menu rendered near the click point after a successful pick.
+ * Buttons trigger Hide / Isolate / Pick Material / Focus actions; an
+ * invisible backdrop dismisses on outside-click without consuming the
+ * follow-up click on a button.
+ *
+ * Position math lives in clampMenuPosition (exported for unit tests).
+ */
+function ActionMenu({
+    target,
+    onHide,
+    onIsolate,
+    onPickMaterial,
+    onFocus,
+    onDismiss,
+}: {
+    target: ActionMenuTarget;
+    onHide: () => void;
+    onIsolate: () => void;
+    onPickMaterial: () => void;
+    onFocus: () => void;
+    onDismiss: () => void;
+}) {
+    const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1920;
+    const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 1080;
+    const { left, top } = clampMenuPosition(
+        target.anchorX, target.anchorY,
+        viewportWidth, viewportHeight,
+    );
+    const targetLabel = target.slot.display_name || target.slot.source_name;
+    return (
+        <>
+            {/* Backdrop — full-screen, invisible, captures outside-clicks. */}
+            <div
+                className="viewport-pick-action-backdrop"
+                data-testid="viewport-pick-action-backdrop"
+                onClick={onDismiss}
+                aria-hidden="true"
+            />
+            <div
+                className="viewport-pick-action-menu"
+                data-testid="viewport-pick-action-menu"
+                style={{ left, top }}
+                role="menu"
+                aria-label={`Action menu for ${targetLabel}`}
+            >
+                <div className="viewport-pick-action-header">
+                    <code>{targetLabel}</code>
+                </div>
+                <button
+                    type="button"
+                    className="viewport-pick-action-button"
+                    data-testid="viewport-pick-action-hide"
+                    onClick={onHide}
+                    role="menuitem"
+                >
+                    Hide
+                </button>
+                <button
+                    type="button"
+                    className="viewport-pick-action-button"
+                    data-testid="viewport-pick-action-isolate"
+                    onClick={onIsolate}
+                    role="menuitem"
+                >
+                    Isolate
+                </button>
+                <button
+                    type="button"
+                    className="viewport-pick-action-button"
+                    data-testid="viewport-pick-action-pick-material"
+                    onClick={onPickMaterial}
+                    role="menuitem"
+                >
+                    Pick Material
+                </button>
+                <button
+                    type="button"
+                    className="viewport-pick-action-button viewport-pick-action-disabled"
+                    data-testid="viewport-pick-action-focus"
+                    onClick={onFocus}
+                    role="menuitem"
+                    title="Comes online with the next view-extension drop"
+                >
+                    Focus
+                </button>
+            </div>
         </>
     );
 }

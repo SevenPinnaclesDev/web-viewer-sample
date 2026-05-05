@@ -138,6 +138,45 @@ export interface PickSlotResult extends MaterialSlot {
     prim_path_picked: string;
 }
 
+// ---- §6 selection.* visibility primitives (2026-05-02 follow-up) ----------
+// Hide / Isolate / Show-All for CAD-style inspection: pick a wall, hide
+// it; isolate an assembly, study it alone; show-all to recover. The kit
+// writes UsdGeomImageable.visibility on the prim ("invisible" / "inherited")
+// — reversible without a stage round-trip.
+//
+// Server contract:
+//   selection.hide_prims     — payload: { prim_paths: [...] }
+//                              result:  { hidden_count: <n> }
+//   selection.show_prims     — payload: { prim_paths: [...] }
+//                              result:  { shown_count: <n> }
+//   selection.isolate_prims  — payload: { prim_paths: [...] }  (≥1)
+//                              result:  { isolated_count, hidden_count }
+//   selection.show_all       — payload: {}
+//                              result:  { shown_count: <n> }
+//
+// Errors: invalid_payload, no_active_stage, prim_not_found, kit_internal.
+
+export interface HidePrimsRequest {
+    prim_paths: string[];
+}
+
+export interface HidePrimsResult {
+    hidden_count: number;
+}
+
+export interface ShowPrimsResult {
+    shown_count: number;
+}
+
+export interface IsolatePrimsResult {
+    isolated_count: number;
+    hidden_count: number;
+}
+
+export interface ShowAllResult {
+    shown_count: number;
+}
+
 // ---- §6 reserved namespace `library.*` ------------------------------------
 // Picker sprint (2026-05-02) — `library.list_materials` is the first command
 // in the library.* namespace. The SPA picker fires it on first open,

@@ -24,6 +24,7 @@ import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
 import "@testing-library/jest-dom/vitest";
 import {
     ViewportPickHandler,
+    clampMenuPosition,
     computeNormalizedCoords,
 } from "../ViewportPickHandler";
 import { ChannelError } from "../../../services/inputChannel";
@@ -207,7 +208,12 @@ describe("ViewportPickHandler", () => {
         expect(pickSlot).not.toHaveBeenCalled();
     });
 
-    it("successful pick opens the picker with the returned slot", async () => {
+    it("successful pick opens the action menu (not the picker directly)", async () => {
+        // Visibility primitives sprint (2026-05-02 follow-up): the pick
+        // flow now goes pick → action menu → "Pick Material" → picker
+        // modal. The action menu carries Hide / Isolate / Pick Material /
+        // Focus, so the operator chooses what to do. The picker only
+        // opens after the operator clicks "Pick Material" inside the menu.
         const pickSlot = vi.fn().mockResolvedValue(sampleSlot);
         const ch = makeMockChannel({ pickSlot });
         const ref = makeRefWithRect({ left: 0, top: 0, width: 1000, height: 800 });
@@ -216,13 +222,15 @@ describe("ViewportPickHandler", () => {
         fireEvent.click(screen.getByTestId("viewport-pick-overlay"), {
             clientX: 500, clientY: 400, button: 0,
         });
-        // Picker root has data-testid="mdl-picker" per MdlPicker. We wait
-        // for it to appear.
+        // Action menu appears with the slot's display_name as the header.
         await waitFor(() => {
-            // The picker headers reference the slot's display_name.
-            // Look for a target-row element since the picker is now open.
-            expect(screen.queryByText(/body_09/i)).toBeInTheDocument();
+            expect(screen.getByTestId("viewport-pick-action-menu")).toBeInTheDocument();
         });
+        // All four action buttons rendered.
+        expect(screen.getByTestId("viewport-pick-action-hide")).toBeInTheDocument();
+        expect(screen.getByTestId("viewport-pick-action-isolate")).toBeInTheDocument();
+        expect(screen.getByTestId("viewport-pick-action-pick-material")).toBeInTheDocument();
+        expect(screen.getByTestId("viewport-pick-action-focus")).toBeInTheDocument();
     });
 
     it("no_hit error is silently ignored (no toast)", async () => {
@@ -308,5 +316,235 @@ describe("ViewportPickHandler", () => {
         // Defensive: a streaming wrapper that hasn't laid out yet has
         // width:0 height:0 — pick should refuse rather than divide by 0.
         expect(computeNormalizedCoords(50, 50, { left: 0, top: 0, width: 0, height: 0 })).toBeNull();
+    });
+
+    // ---- Show All toolbar button ----------------------------------------
+
+    it("renders the Show All button alongside the pick toggle", () => {
+        const ch = makeMockChannel();
+        render(<ViewportPickHandler channel={ch} assetId="compass_step" />);
+        expect(screen.getByTestId("viewport-pick-show-all")).toBeInTheDocument();
+        // No hidden things initially — the count suffix should be absent.
+        expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All");
+    });
+
+    it("Show All is disabled when channel is null", () => {
+        render(<ViewportPickHandler channel={null} assetId="compass_step" />);
+        expect(screen.getByTestId("viewport-pick-show-all")).toBeDisabled();
+    });
+
+    it("Show All click invokes channel.showAll", async () => {
+        const showAll = vi.fn().mockResolvedValue({ shown_count: 42 });
+        const ch = { ...makeMockChannel(), showAll } as any;
+        render(<ViewportPickHandler channel={ch} assetId="compass_step" />);
+        fireEvent.click(screen.getByTestId("viewport-pick-show-all"));
+        await waitFor(() => expect(showAll).toHaveBeenCalledTimes(1));
+    });
+
+    // ---- Action menu: Hide / Isolate / Pick Material / Focus ------------
+
+    async function renderAndPick(
+        chOverrides: Partial<{
+            pickSlot: (x: number, y: number) => Promise<typeof sampleSlot>;
+            hidePrims: (paths: string[]) => Promise<{ hidden_count: number }>;
+            isolatePrims: (paths: string[]) => Promise<{ isolated_count: number; hidden_count: number }>;
+            showAll: () => Promise<{ shown_count: number }>;
+            setMaterialOverride: (a: string, s: string, m: string) => Promise<{}>;
+        }> = {},
+    ) {
+        const pickSlot = chOverrides.pickSlot ?? vi.fn().mockResolvedValue(sampleSlot);
+        const hidePrims = chOverrides.hidePrims ?? vi.fn().mockResolvedValue({ hidden_count: 1 });
+        const isolatePrims = chOverrides.isolatePrims
+            ?? vi.fn().mockResolvedValue({ isolated_count: 4, hidden_count: 12 });
+        const showAll = chOverrides.showAll ?? vi.fn().mockResolvedValue({ shown_count: 16 });
+        const setMaterialOverride = chOverrides.setMaterialOverride
+            ?? vi.fn().mockResolvedValue({});
+        const ch = {
+            ...makeMockChannel({ pickSlot, setMaterialOverride }),
+            hidePrims,
+            isolatePrims,
+            showAll,
+        } as any;
+        const ref = makeRefWithRect({ left: 0, top: 0, width: 1000, height: 800 });
+        const result = render(
+            <ViewportPickHandler channel={ch} assetId="compass_step" streamWrapperRef={ref} />,
+        );
+        fireEvent.click(screen.getByTestId("viewport-pick-toggle"));
+        fireEvent.click(screen.getByTestId("viewport-pick-overlay"), {
+            clientX: 500, clientY: 400, button: 0,
+        });
+        await waitFor(() =>
+            expect(screen.getByTestId("viewport-pick-action-menu")).toBeInTheDocument(),
+        );
+        return { ch, hidePrims, isolatePrims, showAll, ...result };
+    }
+
+    it("clicking Hide on the action menu calls channel.hidePrims with the picked path", async () => {
+        const { hidePrims } = await renderAndPick();
+        fireEvent.click(screen.getByTestId("viewport-pick-action-hide"));
+        await waitFor(() => expect(hidePrims).toHaveBeenCalledTimes(1));
+        expect(hidePrims).toHaveBeenCalledWith(["/World/Compass/Body_09_Geom/Mesh"]);
+        // Action menu dismissed after acting.
+        expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+    });
+
+    it("Hide adds the path to the hidden-set indicator", async () => {
+        const { hidePrims } = await renderAndPick();
+        fireEvent.click(screen.getByTestId("viewport-pick-action-hide"));
+        await waitFor(() => expect(hidePrims).toHaveBeenCalled());
+        // The Show All button text now includes the count suffix.
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All (1)");
+        });
+    });
+
+    it("Show All clears the hidden-set", async () => {
+        const { hidePrims, showAll } = await renderAndPick();
+        // Hide first.
+        fireEvent.click(screen.getByTestId("viewport-pick-action-hide"));
+        await waitFor(() => expect(hidePrims).toHaveBeenCalled());
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All (1)");
+        });
+        // Click Show All.
+        fireEvent.click(screen.getByTestId("viewport-pick-show-all"));
+        await waitFor(() => expect(showAll).toHaveBeenCalled());
+        // Indicator returns to bare "Show All".
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All");
+        });
+    });
+
+    it("clicking Isolate on the action menu calls channel.isolatePrims with the picked path", async () => {
+        const { isolatePrims } = await renderAndPick();
+        fireEvent.click(screen.getByTestId("viewport-pick-action-isolate"));
+        await waitFor(() => expect(isolatePrims).toHaveBeenCalledTimes(1));
+        expect(isolatePrims).toHaveBeenCalledWith(["/World/Compass/Body_09_Geom/Mesh"]);
+        // Menu dismissed.
+        expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+    });
+
+    it("clicking Pick Material on the action menu opens the picker modal", async () => {
+        await renderAndPick();
+        fireEvent.click(screen.getByTestId("viewport-pick-action-pick-material"));
+        // Menu dismissed; picker modal opens.
+        await waitFor(() => {
+            expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+        });
+        // The picker shows the slot's name (Body_09).
+        await waitFor(() => {
+            // Multiple Body_09 references are expected — at minimum one in
+            // the picker's "applying to" header.
+            expect(screen.queryAllByText(/body_09/i).length).toBeGreaterThan(0);
+        });
+    });
+
+    it("Esc dismisses the action menu", async () => {
+        await renderAndPick();
+        await act(async () => {
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        });
+        expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+    });
+
+    it("clicking the backdrop dismisses the action menu", async () => {
+        await renderAndPick();
+        fireEvent.click(screen.getByTestId("viewport-pick-action-backdrop"));
+        expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+    });
+
+    it("Focus button is present but inert (parallel agent owns view.focus_at_point)", async () => {
+        await renderAndPick();
+        const focusBtn = screen.getByTestId("viewport-pick-action-focus");
+        expect(focusBtn).toBeInTheDocument();
+        // Click should NOT throw / lock up. Should dismiss the menu.
+        fireEvent.click(focusBtn);
+        await waitFor(() => {
+            expect(screen.queryByTestId("viewport-pick-action-menu")).not.toBeInTheDocument();
+        });
+    });
+
+    it("Hide failure surfaces a failed toast and does NOT track in hidden-set", async () => {
+        const hidePrims = vi.fn().mockRejectedValue(new ChannelError("kit_internal", "boom"));
+        const { rerender: _r } = await renderAndPick({ hidePrims });
+        fireEvent.click(screen.getByTestId("viewport-pick-action-hide"));
+        await waitFor(() => expect(hidePrims).toHaveBeenCalled());
+        // Failed toast appears.
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-toast-failed")).toBeInTheDocument();
+        });
+        // No hidden-set increment — count suffix absent.
+        expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All");
+    });
+
+    // ---- asset switch resets hidden-set ---------------------------------
+
+    it("changing assetId resets the hidden-set", async () => {
+        const ch = {
+            ...makeMockChannel(),
+            pickSlot: vi.fn().mockResolvedValue(sampleSlot),
+            hidePrims: vi.fn().mockResolvedValue({ hidden_count: 1 }),
+            isolatePrims: vi.fn().mockResolvedValue({ isolated_count: 1, hidden_count: 0 }),
+            showAll: vi.fn().mockResolvedValue({ shown_count: 0 }),
+        } as any;
+        const ref = makeRefWithRect({ left: 0, top: 0, width: 1000, height: 800 });
+        const { rerender } = render(
+            <ViewportPickHandler channel={ch} assetId="compass_step" streamWrapperRef={ref} />,
+        );
+        // Pick + hide.
+        fireEvent.click(screen.getByTestId("viewport-pick-toggle"));
+        fireEvent.click(screen.getByTestId("viewport-pick-overlay"), {
+            clientX: 500, clientY: 400, button: 0,
+        });
+        await waitFor(() =>
+            expect(screen.getByTestId("viewport-pick-action-menu")).toBeInTheDocument(),
+        );
+        fireEvent.click(screen.getByTestId("viewport-pick-action-hide"));
+        await waitFor(() => expect(ch.hidePrims).toHaveBeenCalled());
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All (1)");
+        });
+        // Switch asset.
+        rerender(
+            <ViewportPickHandler channel={ch} assetId="other_asset" streamWrapperRef={ref} />,
+        );
+        // Indicator clears.
+        await waitFor(() => {
+            expect(screen.getByTestId("viewport-pick-show-all").textContent).toBe("Show All");
+        });
+    });
+
+    // ---- clampMenuPosition unit tests -----------------------------------
+
+    it("clampMenuPosition keeps the menu inside the viewport", () => {
+        // Click in the middle — menu fits below-and-right.
+        const middle = clampMenuPosition(500, 400, 1000, 800);
+        expect(middle.left).toBe(500 + 8); // anchorX + offset
+        expect(middle.top).toBe(400 + 8);
+
+        // Click near the right edge — menu flips to the LEFT.
+        const right = clampMenuPosition(950, 400, 1000, 800);
+        expect(right.left).toBeLessThan(950); // anchored on left side of click
+
+        // Click near the bottom — menu flips UP.
+        const bottom = clampMenuPosition(500, 750, 1000, 800);
+        expect(bottom.top).toBeLessThan(750);
+
+        // Click in the bottom-right — both flip.
+        const corner = clampMenuPosition(990, 790, 1000, 800);
+        expect(corner.left).toBeLessThan(990);
+        expect(corner.top).toBeLessThan(790);
+    });
+
+    it("clampMenuPosition clamps to viewport bounds even with degenerate coords", () => {
+        // Click at (0, 0) — would normally place menu at (8, 8); we stay
+        // inside bounds.
+        const tl = clampMenuPosition(0, 0, 1000, 800);
+        expect(tl.left).toBeGreaterThanOrEqual(4);
+        expect(tl.top).toBeGreaterThanOrEqual(4);
+        // Click impossibly far right — clamp to viewport.
+        const offRight = clampMenuPosition(5000, 5000, 1000, 800);
+        expect(offRight.left + 168).toBeLessThanOrEqual(1000);
+        expect(offRight.top + 184).toBeLessThanOrEqual(800);
     });
 });
