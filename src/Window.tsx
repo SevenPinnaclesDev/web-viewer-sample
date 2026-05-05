@@ -19,6 +19,8 @@ import { headerHeight } from './App';
 import { InputChannel } from './services/inputChannel';
 import { SwatchPanel } from './components/swatch/SwatchPanel';
 import { DropZone } from './components/dragdrop/DropZone';
+import { runAuthGate } from './services/authGate';
+import type { User } from './services/whoami';
 
 
 interface USDAssetType {
@@ -52,7 +54,12 @@ interface AppState {
     showStream: boolean;
     showUI: boolean;
     isLoading: boolean;
-    loadingText: string; 
+    loadingText: string;
+    auth:
+        | { kind: "pending" }
+        | { kind: "ready"; user: User }
+        | { kind: "redirected" }
+        | { kind: "error"; message: string };
 }
 
 interface AppStreamMessageType {
@@ -106,7 +113,44 @@ export default class App extends React.Component<AppProps, AppState> {
             showStream: false,
             showUI: false,
             loadingText: StreamConfig.source === "gfn" ? "Log in to GeForce NOW to view stream" : (StreamConfig.source === "stream" ? "Waiting for stream to initialize":  "Waiting for stream to begin"),
-            isLoading: StreamConfig.source === "stream" ? true : false
+            isLoading: StreamConfig.source === "stream" ? true : false,
+            auth: { kind: "pending" },
+        }
+    }
+
+    /** AbortController for the in-flight whoami request — cancelled on
+     * unmount so a stale resolution doesn't try to setState. */
+    private _authAbortController: AbortController | null = null;
+
+    componentDidMount(): void {
+        void this._runAuthCheck();
+    }
+
+    componentWillUnmount(): void {
+        if (this._authAbortController) {
+            this._authAbortController.abort();
+            this._authAbortController = null;
+        }
+    }
+
+    /**
+     * Run the SPA login flow on mount per architecture/identity.md
+     * §"SPA login flow". 401 → full-page redirect to /auth/login;
+     * other failures render an error state with retry.
+     */
+    private async _runAuthCheck(): Promise<void> {
+        this._authAbortController?.abort();
+        const ctl = new AbortController();
+        this._authAbortController = ctl;
+        this.setState({ auth: { kind: "pending" } });
+        const outcome = await runAuthGate({ signal: ctl.signal });
+        if (ctl.signal.aborted) return;
+        if (outcome.kind === "ok") {
+            this.setState({ auth: { kind: "ready", user: outcome.user } });
+        } else if (outcome.kind === "redirected") {
+            this.setState({ auth: { kind: "redirected" } });
+        } else {
+            this.setState({ auth: { kind: "error", message: outcome.message } });
         }
     }
 
@@ -489,21 +533,6 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     /**
-    * @function _ingestServiceUrl
-    *
-    * Resolve the DATE ingest service base URL. The ingest service runs
-    * at :49101 on the same host as the streaming server (per Phase 1.5
-    * D2-D5). For Phase 1 close-the-loop we derive it from the local
-    * stream config; future deployments will surface a separate config
-    * key when ingest moves off-box.
-    *  — Ryan, Phase 1 close-the-loop, 2026-05-01.
-    */
-    private _ingestServiceUrl(): string {
-        const host = StreamConfig.local?.server ?? "localhost";
-        return `https://${host}:49101`;
-    }
-
-    /**
     * @function _handleAppStreamFocus
     *
     * Update state when AppStream is in focus.
@@ -522,6 +551,35 @@ export default class App extends React.Component<AppProps, AppState> {
     }
     
     render() {
+        if (this.state.auth.kind === "pending") {
+            return (
+                <div className="loading-indicator-label" style={{ marginTop: headerHeight + 40 }}>
+                    Checking session…
+                </div>
+            );
+        }
+        if (this.state.auth.kind === "redirected") {
+            return (
+                <div className="loading-indicator-label" style={{ marginTop: headerHeight + 40 }}>
+                    Redirecting to sign in…
+                </div>
+            );
+        }
+        if (this.state.auth.kind === "error") {
+            return (
+                <div className="loading-indicator-label" style={{ marginTop: headerHeight + 40 }}>
+                    <div>Couldn't verify session.</div>
+                    <div style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>{this.state.auth.message}</div>
+                    <button
+                        className="nvidia-button"
+                        style={{ marginTop: 12 }}
+                        onClick={() => { void this._runAuthCheck(); }}
+                    >
+                        Retry
+                    </button>
+                </div>
+            );
+        }
 
         const sidebarWidth = 300;
         return (
@@ -644,7 +702,6 @@ export default class App extends React.Component<AppProps, AppState> {
                   */}
                 <DropZone
                     channel={this.state.showStream ? this._inputChannel : null}
-                    ingestServiceUrl={this._ingestServiceUrl()}
                 />
             </div>
             );
