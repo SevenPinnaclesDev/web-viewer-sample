@@ -231,4 +231,83 @@ describe("InputChannel", () => {
         });
         await expect(p).rejects.toMatchObject({ code: "no_material" });
     });
+
+    // ---- view.focus_at_point (Marcus's CAD-feel orbit fix Part B) ---------
+
+    it("focusAtPoint serializes view.focus_at_point with normalized coords", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.focusAtPoint(0.25, 0.75).catch(() => {});
+        expect(sentJson.length).toBe(1);
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame).toMatchObject({
+            command: "view.focus_at_point",
+            payload: { x_norm: 0.25, y_norm: 0.75 },
+        });
+        // Optional viewport_id should be omitted when not supplied.
+        expect("viewport_id" in frame.payload).toBe(false);
+    });
+
+    it("focusAtPoint includes optional viewport_id when supplied", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.focusAtPoint(0.5, 0.5, "alt-viewport").catch(() => {});
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame.payload).toMatchObject({
+            x_norm: 0.5,
+            y_norm: 0.5,
+            viewport_id: "alt-viewport",
+        });
+    });
+
+    it("focusAtPoint resolves with bbox + focused on ok", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.focusAtPoint(0.5, 0.5);
+        const reqId = JSON.parse(sentJson[0]).id;
+        const focusResult = {
+            focused_prim_path: "/World/Roof/RoofPanel_03",
+            bbox_center: [12.5, 3.0, 7.8] as [number, number, number],
+            bbox_diagonal: 4.2,
+            focused: true,
+        };
+        ch.handleFrame({ id: reqId, ok: true, result: focusResult });
+        await expect(p).resolves.toEqual(focusResult);
+    });
+
+    it("focusAtPoint rejects with no_hit when ray misses geometry", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.focusAtPoint(0.0, 0.0);
+        const reqId = JSON.parse(sentJson[0]).id;
+        ch.handleFrame({
+            id: reqId,
+            ok: false,
+            error: { code: "no_hit", message: "ray missed all geometry" },
+        });
+        await expect(p).rejects.toMatchObject({ code: "no_hit" });
+    });
+
+    it("focusAtPoint surfaces focused: false on partial success", async () => {
+        // The kit's bbox compute succeeded but no compatible viewport
+        // API was found. ok stays true; focused stays false. The SPA
+        // can show a soft hint without treating this as a hard error.
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.focusAtPoint(0.5, 0.5);
+        const reqId = JSON.parse(sentJson[0]).id;
+        ch.handleFrame({
+            id: reqId,
+            ok: true,
+            result: {
+                focused_prim_path: "/World/Wall",
+                bbox_center: [1.0, 1.0, 1.0],
+                bbox_diagonal: 2.0,
+                focused: false,
+            },
+        });
+        const result = await p;
+        expect(result.focused).toBe(false);
+        expect(result.bbox_center).toEqual([1.0, 1.0, 1.0]);
+    });
 });

@@ -25,6 +25,8 @@
 import type {
     ChannelRequest,
     ChannelEvent,
+    FocusAtPointRequest,
+    FocusAtPointResult,
     HidePrimsResult,
     IsolatePrimsResult,
     LibraryCatalog,
@@ -380,5 +382,46 @@ export class InputChannel {
 
     showAll(): Promise<ShowAllResult> {
         return this.request<ShowAllResult>("selection.show_all", {});
+    }
+
+    /**
+     * Focus-on-click (2026-05-04). Marcus's CAD-feel orbit fix, Part B —
+     * when the operator shift-clicks the streamed canvas, the SPA fires
+     * this command. Kit picks the prim under the cursor, computes its
+     * bbox, frames the viewport on it, and sets the orbit pivot to the
+     * bbox centre. Orbit gestures after that spin around what the user
+     * clicked, matching CAD-app convention.
+     *
+     * Pairs with the orbit-pivot-on-asset-load primitive in
+     * mfo.date_viewer.environment (Part A). Both halves of the fix
+     * compute the same numerical bbox via UsdGeom.BBoxCache, so a pivot
+     * set on asset-load and a pivot set by focus-on-click produce the
+     * same centre when targeting the same prim.
+     *
+     * Modifier-key choice (shift-click vs right-click vs floating-action
+     * button) is owned by the caller — this wrapper just sends the
+     * normalized coords. StreamOnlyWindow currently wires shift-click;
+     * the same wrapper can be reused by a future "Focus" button.
+     *
+     * Errors per the kit-side handler:
+     *  - `invalid_payload` — coords out of [0..1] or wrong type
+     *  - `asset_not_open` — kit has no live stage
+     *  - `no_active_viewport` — kit can't acquire an active viewport
+     *  - `no_hit` — ray missed all geometry (operator clicked empty space).
+     *    The SPA's UX policy: silently ignore (no toast), since the user
+     *    can simply try clicking on a part. Rationale: the operator who
+     *    miss-clicks while focusing isn't expressing intent to reset.
+     *  - `kit_internal` — picked prim has no extent (Xform with no
+     *    descendants), or anything else.
+     *
+     * `focused: false` with ok: true is the partial-success case: the
+     * bbox compute succeeded but kit couldn't apply the focus to the
+     * viewport (no compatible API). Rare on Kit 109; the SPA can show
+     * a soft hint without treating it as an error.
+     */
+    focusAtPoint(xNorm: number, yNorm: number, viewportId?: string): Promise<FocusAtPointResult> {
+        const payload: FocusAtPointRequest = { x_norm: xNorm, y_norm: yNorm };
+        if (viewportId !== undefined) payload.viewport_id = viewportId;
+        return this.request<FocusAtPointResult>("view.focus_at_point", payload);
     }
 }

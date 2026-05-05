@@ -20,6 +20,16 @@
  *   - We *also* honor Cmd/Ctrl-click on Mac/PC as a bonus power-user shortcut
  *     that always works regardless of toggle state — zero cost to add
  *
+ * Focus-on-click (2026-05-04, Marcus's CAD-feel orbit fix Part B):
+ *   Shift-click anywhere on the streaming wrapper fires
+ *   `view.focus_at_point` instead of `selection.pick_slot`. Kit picks
+ *   the prim under the cursor and pivots the orbit camera on its bbox
+ *   centre — orbit gestures after that spin around what the user
+ *   clicked. Same modifier-key pattern as the existing Cmd/Ctrl-click
+ *   pick path, just on a different modifier so the two never collide
+ *   (Shift = navigation; Cmd/Ctrl = picking; bare click in pick mode =
+ *   picking). Action menu's "Focus" button uses the same wrapper.
+ *
  * Pick-mode UX:
  *   - Toggle off (default): clicks fall through to AppStream (orbit/pan).
  *     Cmd/Ctrl-click anywhere on the wrapper still triggers a pick.
@@ -311,6 +321,9 @@ export function ViewportPickHandler({
             // Only Cmd-click (Mac) or Ctrl-click (PC). Don't fire on
             // simple click — that would clobber orbit/pan.
             if (!(evt.metaKey || evt.ctrlKey)) return;
+            // Shift-click is reserved for view.focus_at_point — see the
+            // Shift-click handler below. Don't double-fire.
+            if (evt.shiftKey) return;
             // Only primary button.
             if (evt.button !== 0) return;
             // If the click was inside our overlay, the overlay's onClick
@@ -341,6 +354,74 @@ export function ViewportPickHandler({
         window.addEventListener("click", handler, true);
         return () => window.removeEventListener("click", handler, true);
     }, [channel, assetId, streamWrapperRef, performPick]);
+
+    // ---- shift-click → view.focus_at_point (CAD-feel orbit fix Part B) -----
+    //
+    // Marcus's brief (2026-05-04): when the user shift-clicks a part on
+    // the streaming canvas, kit picks the prim under the cursor and
+    // pivots the orbit camera on its bbox centre. Subsequent orbit
+    // gestures spin around what the user clicked, matching CAD-app
+    // convention.
+    //
+    // Modifier-key collision avoidance: Cmd/Ctrl = picking (existing),
+    // Shift = focus (new). Bare click in pick-mode = picking. The three
+    // surfaces never overlap — a Shift-Cmd-click is ambiguous in browser
+    // event semantics so we let Shift win (focus, the navigation primitive).
+    useEffect(() => {
+        if (!channel || !assetId) return;
+        const handler = (evt: MouseEvent) => {
+            if (!evt.shiftKey) return;
+            if (evt.button !== 0) return;
+            // If pick-mode is on AND the user shift-clicks inside the
+            // overlay, the overlay's onClick still fires (overlay's
+            // onClick doesn't filter on shift). Pre-empt by stopping
+            // propagation here. The overlay observes data-testid; we
+            // detect via target closest like the Cmd-click path.
+            const wrapper = streamWrapperRef?.current;
+            if (!wrapper) return;
+            const rect = wrapper.getBoundingClientRect();
+            if (
+                evt.clientX < rect.left || evt.clientX > rect.right ||
+                evt.clientY < rect.top || evt.clientY > rect.bottom
+            ) {
+                return;
+            }
+            const coords = computeNormalizedCoords(evt.clientX, evt.clientY, rect);
+            if (coords === null) return;
+            evt.preventDefault();
+            evt.stopPropagation();
+            void (async () => {
+                try {
+                    const result = await channel.focusAtPoint(coords.xNorm, coords.yNorm);
+                    if (!result.focused) {
+                        // Bbox compute succeeded but kit couldn't apply
+                        // the focus to the viewport — soft hint, no error.
+                        showToast({
+                            kind: "info",
+                            message: "Couldn't apply focus — try again or reload the asset.",
+                        });
+                    }
+                    // Successful focus: silent. The viewport visibly
+                    // re-frames; no toast needed (would just clutter).
+                } catch (err) {
+                    const ce = err instanceof ChannelError
+                        ? err
+                        : new ChannelError("kit_internal", err instanceof Error ? err.message : String(err));
+                    if (ce.code === "no_hit") {
+                        // Operator shift-clicked empty space. Silent
+                        // (mirrors selection.pick_slot's no_hit policy).
+                        return;
+                    }
+                    showToast({
+                        kind: "failed",
+                        message: `Focus failed: ${ce.code}: ${ce.message}`,
+                    });
+                }
+            })();
+        };
+        window.addEventListener("click", handler, true);
+        return () => window.removeEventListener("click", handler, true);
+    }, [channel, assetId, streamWrapperRef, showToast]);
 
     // ---- Esc to exit pick mode --------------------------------------------
 
@@ -456,19 +537,57 @@ export function ViewportPickHandler({
         setActionMenuTarget(null);
     }, [actionMenuTarget]);
 
-    /** "Focus" — placeholder. Wires up when the parallel agent's
-     * view.focus_at_point command lands. Until then the button is
-     * rendered but disabled. */
-    const handleActionFocus = useCallback(() => {
-        // Intentionally inert at v1 — the kit-side view.focus_at_point
-        // command isn't implemented yet (parallel agent's lane). When
-        // landed: call channel.focusAtPoint(prim_path_picked).
-        showToast({
-            kind: "info",
-            message: "Focus comes online with the next view-extension drop.",
-        });
+    /** "Focus" — fires view.focus_at_point on the picked location.
+     *
+     * The action menu records (anchorX, anchorY) and the picked slot
+     * which carries `prim_path_picked`. We could re-pick by sending the
+     * stored normalized coords, but that re-runs the raycast unnecessarily
+     * — kit already gave us the prim path. We can't pass the path
+     * directly to view.focus_at_point at v1 (the contract takes
+     * normalized coords, mirroring selection.pick_slot for surface
+     * symmetry), so we re-send the same anchor. Kit picks the same
+     * prim, computes its bbox, frames the viewport.
+     *
+     * Future v1.1: add a view.focus_on_path variant that takes a prim
+     * path directly so the action menu's Focus button is a one-shot.
+     * Until then the cost is one extra raycast — measured at sub-ms
+     * even on Compass.
+     */
+    const handleActionFocus = useCallback(async () => {
+        if (!channel || !actionMenuTarget) return;
+        const targetLabel = actionMenuTarget.slot.display_name || actionMenuTarget.slot.source_name;
+        // Re-derive the normalized coords from the stored anchor + the
+        // current viewport rect. Cheaper than caching the pick coords;
+        // also robust to the user resizing the window between the
+        // original pick and the menu action.
+        const wrapper = streamWrapperRef?.current;
+        if (!wrapper) {
+            setActionMenuTarget(null);
+            return;
+        }
+        const rect = wrapper.getBoundingClientRect();
+        const coords = computeNormalizedCoords(
+            actionMenuTarget.anchorX, actionMenuTarget.anchorY, rect,
+        );
         setActionMenuTarget(null);
-    }, [showToast]);
+        if (coords === null) return;
+        try {
+            await channel.focusAtPoint(coords.xNorm, coords.yNorm);
+            showToast({ kind: "info", message: `Focused on ${targetLabel}` });
+        } catch (err) {
+            const ce = err instanceof ChannelError
+                ? err
+                : new ChannelError("kit_internal", err instanceof Error ? err.message : String(err));
+            // no_hit / no_active_viewport are unlikely here (we just
+            // picked successfully) but possible if the user resized
+            // / reloaded between pick and Focus click. Surface as info.
+            if (ce.code === "no_hit") {
+                showToast({ kind: "info", message: "Couldn't focus — try clicking again." });
+                return;
+            }
+            showToast({ kind: "failed", message: `Focus failed: ${ce.code}: ${ce.message}` });
+        }
+    }, [channel, actionMenuTarget, streamWrapperRef, showToast]);
 
     /** Show All — toolbar button. Always available. Resets hiddenPaths. */
     const handleShowAll = useCallback(async () => {
@@ -671,11 +790,11 @@ function ActionMenu({
                 </button>
                 <button
                     type="button"
-                    className="viewport-pick-action-button viewport-pick-action-disabled"
+                    className="viewport-pick-action-button"
                     data-testid="viewport-pick-action-focus"
                     onClick={onFocus}
                     role="menuitem"
-                    title="Comes online with the next view-extension drop"
+                    title="Frame and pivot orbit on this part (or hold Shift and click)"
                 >
                     Focus
                 </button>

@@ -177,6 +177,56 @@ export interface ShowAllResult {
     shown_count: number;
 }
 
+// ---- §6 reserved namespace `view.*` ---------------------------------------
+// Focus-on-click (2026-05-04). The CAD-feel orbit fix: when the user
+// shift-clicks a part, kit picks the prim under the cursor, frames the
+// viewport on it, and sets the orbit pivot to the prim's bbox centre.
+// Subsequent orbit gestures spin around what the user clicked, matching
+// CAD-app convention. Pairs with the orbit-pivot-on-asset-load primitive
+// in mfo.date_viewer.environment (auto-pivot on every fresh asset).
+//
+// Server contract:
+//   view.focus_at_point — payload: { x_norm: number, y_norm: number,
+//                                    viewport_id?: string }
+//                         result:  { focused_prim_path: string,
+//                                    bbox_center: [x, y, z],
+//                                    bbox_diagonal: number,
+//                                    focused: boolean }
+//
+// `focused: false` with ok:true means the bbox compute succeeded but
+// kit couldn't apply the result to the viewport (no compatible API on
+// the running Composer build). Rare; surfaces as a soft "couldn't focus"
+// hint rather than a hard error.
+//
+// Errors: invalid_payload, asset_not_open, no_active_viewport, no_hit,
+// kit_internal.
+
+export interface FocusAtPointRequest {
+    /** Normalized x coord in the streaming viewport, [0..1]. Same convention
+     *  as PickSlotRequest — the click handler converts pixel coords to
+     *  normalized using the canvas bounding rect. */
+    x_norm: number;
+    /** Normalized y coord in the streaming viewport, [0..1]. */
+    y_norm: number;
+    /** Optional viewport identifier. v1 only has one viewport — kit ignores. */
+    viewport_id?: string;
+}
+
+export interface FocusAtPointResult {
+    /** USD prim path that was picked + framed. */
+    focused_prim_path: string;
+    /** World-space centre of the picked prim's AABB. The new orbit pivot. */
+    bbox_center: [number, number, number];
+    /** Length of the AABB's space diagonal — useful for the SPA if it
+     *  wants to drive a camera-distance heuristic, otherwise ignored. */
+    bbox_diagonal: number;
+    /** True if kit was able to apply the focus to the viewport (most
+     *  common case in Kit 109). False means the bbox compute succeeded
+     *  but the viewport-mutation API wasn't available — the SPA can
+     *  show a soft hint without treating this as an error. */
+    focused: boolean;
+}
+
 // ---- §6 reserved namespace `library.*` ------------------------------------
 // Picker sprint (2026-05-02) — `library.list_materials` is the first command
 // in the library.* namespace. The SPA picker fires it on first open,
