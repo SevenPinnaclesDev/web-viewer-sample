@@ -162,4 +162,73 @@ describe("InputChannel", () => {
 
         await expect(p).resolves.toEqual(resultBody);
     });
+
+    // ---- selection.pick_slot (tap-to-pick, 2026-05-04) -------------------
+
+    it("pickSlot sends selection.pick_slot with x_norm + y_norm payload", () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.pickSlot(0.25, 0.75).catch(() => {});
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame.command).toBe("selection.pick_slot");
+        expect(frame.payload).toEqual({ x_norm: 0.25, y_norm: 0.75 });
+    });
+
+    it("pickSlot includes viewport_id when provided", () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        ch.pickSlot(0.5, 0.5, "alt-viewport").catch(() => {});
+        const frame = JSON.parse(sentJson[0]);
+        expect(frame.payload).toEqual({
+            x_norm: 0.5,
+            y_norm: 0.5,
+            viewport_id: "alt-viewport",
+        });
+    });
+
+    it("pickSlot resolves with a slot-shape response on ok", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.pickSlot(0.5, 0.5);
+        const reqId = JSON.parse(sentJson[0]).id;
+        const slotResult = {
+            slot_id: "Body_09@compass_step",
+            source_name: "Body_09",
+            display_name: "Body227",
+            placeholder_color: [0.494, 0.494, 0.494] as [number, number, number],
+            bound_prim_count: 12,
+            bound_body_names: ["Body227"],
+            is_overridden: false,
+            current_mdl_path: null,
+            prim_path_picked: "/World/Compass/Body_09_Geom/Mesh",
+        };
+        ch.handleFrame({ id: reqId, ok: true, result: slotResult });
+        await expect(p).resolves.toEqual(slotResult);
+    });
+
+    it("pickSlot rejects with no_hit error code when ray misses", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.pickSlot(0.1, 0.1);
+        const reqId = JSON.parse(sentJson[0]).id;
+        ch.handleFrame({
+            id: reqId,
+            ok: false,
+            error: { code: "no_hit", message: "ray missed all geometry" },
+        });
+        await expect(p).rejects.toMatchObject({ code: "no_hit" });
+    });
+
+    it("pickSlot rejects with no_material when prim has no shader", async () => {
+        const sentJson: string[] = [];
+        const ch = new InputChannel((j) => sentJson.push(j));
+        const p = ch.pickSlot(0.5, 0.5);
+        const reqId = JSON.parse(sentJson[0]).id;
+        ch.handleFrame({
+            id: reqId,
+            ok: false,
+            error: { code: "no_material", message: "no material binding" },
+        });
+        await expect(p).rejects.toMatchObject({ code: "no_material" });
+    });
 });

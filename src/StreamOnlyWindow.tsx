@@ -15,6 +15,7 @@ import { AppProps } from './Window';
 import { headerHeight } from './App';
 import { DropZone } from './components/dragdrop/DropZone';
 import { AssetBrowser } from './components/assetbrowser/AssetBrowser';
+import { ViewportPickHandler } from './components/viewport-pick/ViewportPickHandler';
 import { InputChannel } from './services/inputChannel';
 import StreamConfig from '../stream.config.json';
 
@@ -23,6 +24,12 @@ interface StreamOnlyState {
      * Gates the input_channel_v1 channel passed to DropZone — no point
      * sending kit messages before the data channel is ready. */
     showStream: boolean;
+
+    /** Currently-open asset slug per the kit's `asset.opened` event.
+     * ViewportPickHandler needs this to apply overrides on tap-to-pick;
+     * `null` until the kit announces an asset (DropZone or AssetBrowser
+     * triggers an open, kit fires asset.opened, we cache the slug). */
+    currentAssetId: string | null;
 }
 
 /**
@@ -51,11 +58,41 @@ export default class StreamOnly extends React.Component<AppProps, StreamOnlyStat
         { defaultTimeoutMs: 8_000 },
     );
 
+    /** Ref to the streaming wrapper so ViewportPickHandler can measure
+     * its bounding rect for click→[0..1] normalization. */
+    private _streamWrapperRef = React.createRef<HTMLDivElement>();
+
+    /** Unsubscribe handle for the asset.opened subscription. */
+    private _assetOpenedUnsubscribe: (() => void) | null = null;
+
     constructor(props: AppProps) {
         super(props);
         this.state = {
             showStream: false,
+            currentAssetId: null,
         };
+    }
+
+    componentDidMount(): void {
+        // Subscribe to asset.opened so we can update currentAssetId for
+        // ViewportPickHandler. The kit fires this whenever a new asset
+        // finishes loading (Composer's StageEventType.OPENED).
+        this._assetOpenedUnsubscribe = this._inputChannel.onEvent(
+            "asset.opened",
+            (evt) => {
+                const slug = (evt.payload as { asset_id?: string })?.asset_id;
+                if (typeof slug === "string" && slug.length > 0) {
+                    this.setState({ currentAssetId: slug });
+                }
+            },
+        );
+    }
+
+    componentWillUnmount(): void {
+        if (this._assetOpenedUnsubscribe) {
+            this._assetOpenedUnsubscribe();
+            this._assetOpenedUnsubscribe = null;
+        }
     }
 
     /**
@@ -118,7 +155,7 @@ export default class StreamOnly extends React.Component<AppProps, StreamOnlyStat
                     margin: 0
                 }}
             >
-                <div id="streamonly-wrapper">
+                <div id="streamonly-wrapper" ref={this._streamWrapperRef}>
                     <AppStream
                         sessionId={this.props.sessionId}
                         backendUrl={this.props.backendUrl}
@@ -161,6 +198,20 @@ export default class StreamOnly extends React.Component<AppProps, StreamOnlyStat
                 <AssetBrowser
                     channel={this.state.showStream ? this._inputChannel : null}
                     ingestServiceUrl={this._ingestServiceUrl()}
+                />
+
+                {/* Tap-to-pick — captures clicks on the streamed viewport,
+                  * resolves the prim under the tap to a material slot, and
+                  * opens the picker pre-populated. This is Jim's customer-
+                  * zero centerpiece (CoffeeWithJim 2026-05-03): "tap a
+                  * wall, pick a material, the wall changes color live."
+                  * Pick mode is a TOGGLE button (touch-friendly, since the
+                  * customer-zero target is iPad streamed). Cmd/Ctrl-click
+                  * works in addition for mouse-driven sessions. */}
+                <ViewportPickHandler
+                    channel={this.state.showStream ? this._inputChannel : null}
+                    assetId={this.state.currentAssetId}
+                    streamWrapperRef={this._streamWrapperRef}
                 />
             </div>
         );

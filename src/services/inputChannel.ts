@@ -28,6 +28,8 @@ import type {
     LibraryCatalog,
     OpenAssetRequest,
     OpenAssetResult,
+    PickSlotRequest,
+    PickSlotResult,
     QuerySlotsResult,
     SetOverridesBulkResult,
 } from "./inputChannelTypes";
@@ -301,5 +303,35 @@ export class InputChannel {
      */
     listLibraryMaterials(): Promise<LibraryCatalog> {
         return this.request<LibraryCatalog>("library.list_materials", {});
+    }
+
+    /**
+     * Tap-to-pick (2026-05-04): screen-space pick on the streamed
+     * viewport. Normalized coords are [0..1]; the SPA's click handler
+     * converts pixel coords → normalized using the canvas bounding rect.
+     *
+     * Kit raycasts, walks up to the first ancestor with a Material
+     * binding (Hoops sometimes binds the Xform parent rather than the
+     * leaf mesh), and returns the same slot shape `material.query_slots`
+     * returns plus `prim_path_picked`.
+     *
+     * Errors per kit-side handler:
+     *  - `invalid_payload` — coords out of [0..1] or wrong type
+     *  - `asset_not_open` — kit has no live stage
+     *  - `no_active_viewport` — kit can't acquire an active viewport
+     *  - `no_hit` — ray missed all geometry (operator tapped empty space)
+     *  - `no_material` — picked prim has no material binding (no shader on it)
+     *  - `slot_not_found` — defensive; binding resolved but consolidation failed
+     *  - `kit_internal` — anything else
+     *
+     * The SPA's UX policy on these errors is owned by the click handler
+     * (StreamOnlyWindow.onPick): no-hit is silently ignored; no-material
+     * shows a toast "open in Composer to add a shader"; the rest surface
+     * via the same channel-error path other commands use.
+     */
+    pickSlot(xNorm: number, yNorm: number, viewportId?: string): Promise<PickSlotResult> {
+        const payload: PickSlotRequest = { x_norm: xNorm, y_norm: yNorm };
+        if (viewportId !== undefined) payload.viewport_id = viewportId;
+        return this.request<PickSlotResult>("selection.pick_slot", payload);
     }
 }

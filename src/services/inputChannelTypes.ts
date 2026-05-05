@@ -115,6 +115,29 @@ export interface OpenAssetResult {
     version?: number;
 }
 
+// ---- §6 reserved namespace `selection.*` ----------------------------------
+// Tap-to-pick (2026-05-04). The SPA captures a click on the streaming
+// canvas, normalizes coords to [0..1], and fires `selection.pick_slot`.
+// Kit raycasts, finds the bound material, and returns the same slot shape
+// `material.query_slots` returns (for one slot) plus `prim_path_picked`.
+// The SPA opens the picker pre-populated with that slot.
+
+export interface PickSlotRequest {
+    /** Normalized x coord in the streaming viewport, [0..1]. 0 = left edge, 1 = right. */
+    x_norm: number;
+    /** Normalized y coord in the streaming viewport, [0..1]. 0 = top edge, 1 = bottom. */
+    y_norm: number;
+    /** Optional viewport identifier. v1 only has one viewport — kit ignores. */
+    viewport_id?: string;
+}
+
+/** Same shape as MaterialSlot, plus the prim path that was actually under
+ *  the tap. Useful for diagnostic UX hints ("you tapped X, that's slot Y"). */
+export interface PickSlotResult extends MaterialSlot {
+    /** USD prim path of whatever the ray hit. Always set on success. */
+    prim_path_picked: string;
+}
+
 // ---- §6 reserved namespace `library.*` ------------------------------------
 // Picker sprint (2026-05-02) — `library.list_materials` is the first command
 // in the library.* namespace. The SPA picker fires it on first open,
