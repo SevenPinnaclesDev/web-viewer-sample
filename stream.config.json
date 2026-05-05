@@ -1,5 +1,5 @@
 {
-    "$comment": "source can be 'gfn', 'local' or 'stream'",
+    "$comment": "DATE same-origin contract (2026-05-04): the SPA reaches all backends through Caddy at the page origin. /api/* routes to ingest, /auth/* routes to the auth service, /stream/* routes to the kit-app signaling. The local.server / local.signalingPort / local.mediaPort fields below remain for the upstream NVIDIA streaming-library AppStream entry point only — Caddy still terminates TLS and reverse-proxies the kit-app signaling to those ports on the substrate, but the SPA's *own* fetch + WebSocket calls (assets, ingest, ingest lifecycle, whoami) all use same-origin paths via services/apiBase.ts and never read these fields. A future cleanup should route the AppStream signaling through /stream/* same-origin too; until then, the substrate-side ports are still substrate-side facts.",
     "source": "local",
     "stream":
     {
@@ -14,7 +14,7 @@
         "cmsId": 0
     },
     "local": {
-        "$comment": "DATE Phase 0.5+ — defaults to date-viewer-streaming on :49102 (clean customer-facing kit-app). mfo.date_viewer.environment extension (commit f712e12) closes the empty-stage rendering: DistantLight + auto-frame on ASSETS_LOADED so dropped/picked assets render lit and centered. Use ?stream_port=49100 for Composer (the Twin Architect's authoring tool).",
+        "$comment": "Substrate-side kit-app streaming target. Caddy reverse-proxies /stream/* to these ports; the SPA still passes them through the upstream NVIDIA AppStreamer connect path until the kit-app stream signaling is moved behind /stream/* same-origin too.",
         "server": "dasb256.tailcb8137.ts.net",
         "signalingPort": 49102,
         "mediaPort": null
